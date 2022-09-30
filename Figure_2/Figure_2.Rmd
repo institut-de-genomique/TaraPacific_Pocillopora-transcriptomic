@@ -1,4 +1,3 @@
-```{r}
 ##################
 #Symbio ITS2/SNPs#
 ##################
@@ -14,6 +13,7 @@
 #project directory
 #setwd("/env/cns/proj/TaraPacifique/ARTICLES/MetaTArticle/ITS2-analysis")
 
+```{r}
 library(reshape2)
 library(ggplot2)
 library(RColorBrewer)
@@ -67,6 +67,7 @@ ggplot(tab4)+
   facet_grid(.~Island,scale="free",space="free")+
   theme(axis.text.x=element_text(angle=90),panel.grid=element_blank(),axis.ticks.x=element_blank(),panel.background=element_blank(),axis.line=element_blank(),legend.key.size=unit(2,"mm"))+guides(fill=guide_legend(ncol=1))
 dev.off()
+```
 
 #Idem for all colonies in each island separately (not published)
 pdf(file="ITS2_All_poc_colonies.pdf",width=15)
