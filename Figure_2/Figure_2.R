@@ -1,8 +1,7 @@
-##################
-#Symbio ITS2/SNPs#
-##################
-#Comparison between ITS2 profiles and SNP clustering
-#-->SNP clustering = Julie Lê-Hoang's cahier
+#Symbio ITS2/SNPs
+
+Comparison between ITS2 profiles and SNP clustering
+-->SNP clustering = Julie Lê-Hoang's cahier
 
 ###############
 #ITS2 analysis#
