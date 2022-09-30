@@ -1,7 +1,9 @@
-#Symbio ITS2/SNPs
-
-Comparison between ITS2 profiles and SNP clustering
--->SNP clustering = Julie Lê-Hoang's cahier
+```{r}
+##################
+#Symbio ITS2/SNPs#
+##################
+#Comparison between ITS2 profiles and SNP clustering
+#-->SNP clustering = Julie Lê-Hoang's cahier
 
 ###############
 #ITS2 analysis#
@@ -11,6 +13,7 @@ Comparison between ITS2 profiles and SNP clustering
 #setwd("/env/cns/proj/TaraPacifique/scratch/METAB_WORK/Quentin/ITS2-analysis/")
 #project directory
 #setwd("/env/cns/proj/TaraPacifique/ARTICLES/MetaTArticle/ITS2-analysis")
+
 library(reshape2)
 library(ggplot2)
 library(RColorBrewer)
@@ -160,3 +163,4 @@ hclu<-hclust(as.dist(mat2))
 pdf(file="Hclus_ITS2-distance.pdf",width=17,height = 11)
 plot(hclu)
 dev.off()
+```
