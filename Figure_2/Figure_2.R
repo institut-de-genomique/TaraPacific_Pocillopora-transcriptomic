@@ -3,19 +3,17 @@
 #-->SNP clustering = Julie Lê-Hoang's cahier
 
 ##ITS2 analysis
-Analysis of ITS2 from Ben Hume Symportal results for the first 11 islands.
 
-```{r}
+#Analysis of ITS2 from Ben Hume Symportal results for the first 11 islands.
 library(reshape2)
 library(ggplot2)
 library(RColorBrewer)
 colors<-brewer.pal(8,"Set1")
 pal<-colorRampPalette(colors)
 set<-sample(pal(13),replace = F)
-```
-ITS2.txt table is converted from TARA_PACIFIC_METAB_ITS2_coral_its2_type_profiles_absolute_abund_and_meta_v1.csv
-On google drive (from Ben Hume) but soon accessible on zenodo: https://docs.google.com/document/d/1mDSttur-4suuO-p5etcRSt1YK4FibeaH/edit#bookmark=id.gjdgxs
-```{r}
+
+#ITS2.txt table is converted from TARA_PACIFIC_METAB_ITS2_coral_its2_type_profiles_absolute_abund_and_meta_v1.csv
+#On google drive (from Ben Hume) but soon accessible on zenodo: https://docs.google.com/document/d/1mDSttur-4suuO-p5etcRSt1YK4FibeaH/edit#bookmark=id.gjdgxs
 tab<-read.table(file = "ITS2.txt",sep="\t",h=T,check.names = F)
 tab2<-melt(tab,id.vars = colnames(tab[,1:4]), measure.vars = colnames(tab[,5:ncol(tab)]))
 colnames(tab2)<-c("ProfileNumber","SampleName","Taxon","RefCollab","ProfileName","Value")
@@ -31,6 +29,7 @@ tab3$SiteColo<-substr(tab3$SampleName,5,12)
 tab4<-tab3[tab3$Experiment=="METAT"&tab3$Taxon=="Pocillopora",]
 tab4$SampleName<-sub(".*?_","",sub("_OA.*","",tab4$SampleName))
 tab4$Island<-factor(tab4$Island,levels=sort(unique(tab4$Island),decreasing = T))
+
 #Specific color selection
 set<-c("#3a867c","#3a9a7c",
        "#fa04b3",
@@ -48,9 +47,7 @@ set<-c("#3a867c","#3a9a7c",
        "#d7d40e",
        "#4e9af5",
        "#E41A1C","#ee1a1c","#f81a1c","#ff1a1c")
-```
-Supplementary figure 2
-```{r}
+#Supplementary figure 2
 pdf(file="ITS2_type2_Pocillo.pdf",width=12)
 ggplot(tab4)+
   geom_bar(aes(x=SampleName,y=Value,fill=Type),stat="identity",position="fill")+
@@ -58,8 +55,7 @@ ggplot(tab4)+
   facet_grid(.~Island,scale="free",space="free")+
   theme(axis.text.x=element_text(angle=90),panel.grid=element_blank(),axis.ticks.x=element_blank(),panel.background=element_blank(),axis.line=element_blank(),legend.key.size=unit(2,"mm"))+guides(fill=guide_legend(ncol=1))
 dev.off()
-```
-```{r}
+
 #Idem for all colonies in each island separately (not published)
 pdf(file="ITS2_All_poc_colonies.pdf",width=15)
 for (i in sort(unique(tab3$Island))){
@@ -155,4 +151,3 @@ hclu<-hclust(as.dist(mat2))
 pdf(file="Hclus_ITS2-distance.pdf",width=17,height = 11)
 plot(hclu)
 dev.off()
-```
