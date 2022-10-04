@@ -1,11 +1,11 @@
 # Variance partitioning
 
-To obtain figure 3 of the article required files are :
--the associations between host, symbiont and island : Variables11Islands.txt
--normalized gene expression for the host: Pocillopora_MetaT_TPM.tab
--normalized gene expression for the symbiont: CladocopiumC1_MetaT_TPM.tab
+To obtain figure 3 of the article required files are :  
+-the associations between host, symbiont and island : Variables11Islands.txt  
+-normalized gene expression for the host: Pocillopora_MetaT_TPM.tab  
+-normalized gene expression for the symbiont: CladocopiumC1_MetaT_TPM.tab  
 
-The R script VariancePartition_subsampling.R execute variance partition 5 times with a random subsampling of 2 samples.
+The R script VariancePartition_subsampling.R execute variance partition 5 times with a random subsampling of 2 samples.  
 To get 100 different subsampling, the following command was performed 22 times.
 
 ```bash
@@ -20,7 +20,7 @@ cat Varpart_Host_rep10_* | awk '$4>0&&$1!="Gene"{print $0}' > Varpart_Host-combi
 ```
 
 
-Conversion of Varpart_Symbiont-combined.tab file into table with R (lot of memory required). 
+Conversion of Varpart_Symbiont-combined.tab file into table with R (lot of memory required).   
 Similar commands for the host.
 
 ```r
