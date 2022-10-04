@@ -7,8 +7,8 @@ To get 100 different subsampling, the following command was performed 22 times.
 
 Concatenation of output files
 
-`cat Varpart_Symbiont_rep10_* | awk '$4>0&&$1!="Gene"{print $0}' > Varpart_Symbiont-combined.tab
-cat Varpart_Host_rep10_* | awk '$4>0&&$1!="Gene"{print $0}' > Varpart_Host-combined.tab`
+`cat Varpart_Symbiont_rep10_* | awk '$4>0&&$1!="Gene"{print $0}' > Varpart_Symbiont-combined.tab`
+`cat Varpart_Host_rep10_* | awk '$4>0&&$1!="Gene"{print $0}' > Varpart_Host-combined.tab`
 
 
 Conversion of Varpart_Symbiont-combined.tab file into table with R (lot of memory required)
