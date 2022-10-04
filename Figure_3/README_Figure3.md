@@ -1,16 +1,20 @@
 # Variance partitioning
-
+<p>
 The R script execute variance partition 5 times with a random subsampling of 2 samples.
 To get 100 different subsampling, the following command was performed 22 times.
-`for i in \`seq 1 22\`;do Rscript --vanilla VariancePartition_subsampling.R --variables=Variables11Islands.txt --HostExpression=Pocillopora_MetaT_TPM.tab --OutHost=Varpart_Host_rep10_${i}.tab --SymbiontExpression=CladocopiumC1_MetaT_TPM.tab --OutSymbiont=Varpart_Symbiont_rep10_${i}.tab --CPU=6;sleep 30;done`
+<\p>
+`for i in seq 1 22;do Rscript --vanilla VariancePartition_subsampling.R --variables=Variables11Islands.txt --HostExpression=Pocillopora_MetaT_TPM.tab --OutHost=Varpart_Host_rep10_${i}.tab --SymbiontExpression=CladocopiumC1_MetaT_TPM.tab --OutSymbiont=Varpart_Symbiont_rep10_${i}.tab --CPU=6;sleep 30;done`
 
+<p>
 Concatenation of output files
+<\p>
 `cat Varpart_Symbiont_rep10_* | awk '$4>0&&$1!="Gene"{print $0}' > Varpart_Symbiont-combined.tab
 cat Varpart_Host_rep10_* | awk '$4>0&&$1!="Gene"{print $0}' > Varpart_Host-combined.tab`
 
+<p>
 Conversion of Varpart_Symbiont-combined.tab file into table with R (lot of memory required)
 Similar commands for the host.
-
+<\p>
 `library(data.table)
 library(reshape2)
 tab<-fread("Varpart_Symbiont-combined.tab",h=F,sep="\t")
