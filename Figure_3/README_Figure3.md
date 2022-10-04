@@ -1,6 +1,6 @@
 # Variance partitioning
 
-To obtain figure 3 of the article required files are :  
+To obtain Figure 3 of the article required files are :  
 -the associations between host, symbiont and island : Variables11Islands.txt  
 -normalized gene expression for the host: Pocillopora_MetaT_TPM.tab  
 -normalized gene expression for the symbiont: CladocopiumC1_MetaT_TPM.tab  
