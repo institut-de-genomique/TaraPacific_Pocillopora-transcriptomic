@@ -31,3 +31,63 @@ tab2<-acast(tab,V1+V2~V4,fill=0,fun.aggregate=mean,value.var="V3")
 tab3<-tab2[grep("Residuals",rownames(tab2),invert=T),]
 write.table(tab3,file="Varpart_Symbiont-combined_formated.tab",sep="\t",quote=F)
 ```
+Similar commands for the host.
+
+```r
+library(data.table)
+library(reshape2)
+tab<-fread("Varpart_Host-combined.tab",h=F,sep="\t")
+tab2<-acast(tab,V1+V2~V4,fill=0,fun.aggregate=mean,value.var="V3")
+tab3<-tab2[grep("Residuals",rownames(tab2),invert=T),]
+write.table(tab3,file="Varpart_Host-combined_formated.tab",sep="\t",quote=F)
+```
+
+Generation of Figure 3 for the host and the Symbiont using Varpart_Host-combined_formated.tab file.
+
+```r
+Genet<-read.table("Variables11Islands.txt",sep="\t",h=T)
+rownames(Genet)<-Genet$Samples
+library(RColorBrewer)
+set<-brewer.pal(8,"Set2")
+
+#For the Symbiont.
+library(ggplot2)
+Varpart<-read.table(file="Varpart_Symbiont-combined_formated.tab",sep="\t",h=T)
+Varpart2<-Varpart[,2:101]
+Varpart3<-data.frame(Gene=sub("_(Islands|PocilloGG|SymbioGG)","",rownames(Varpart2)),Variable=sub(".*_","",rownames(Varpart2)),VarianceMedian=apply(Varpart2,1,median),sd=apply(Varpart2,1,sd),Q1=apply(Varpart2,1,function(x){quantile(x,probs = 0.25)}),Q3=apply(Varpart2,1,function(x){quantile(x,probs = 0.75)}),row.names = NULL)
+Varpart3<-Varpart3[order(Varpart3$VarianceMedian,decreasing = T),]
+Varpart3$Gene<-factor(Varpart3$Gene,levels=unique(Varpart3$Gene))
+
+head(Varpart3)
+
+pdf(file="VariancePartitionSymbiont_batchcorrected_I04corrected.pdf",width=9)
+ggplot(Varpart3[Varpart3$VarianceMedian>=0.5,])+ 
+  geom_violin(scale = "count",size=0.1,aes(x=Variable,y=VarianceMedian*100,fill=Variable))+ 
+  geom_boxplot(width=0.05,fill="grey60",size=0.1,aes(x=Variable,y=VarianceMedian*100))+
+  scale_fill_manual(values=set[1:3])+
+  scale_x_discrete(expand=c(0,0))+
+  geom_text(data=data.frame(table(Varpart3[Varpart3$VarianceMedian>=0.5,2])),aes(x=Var1,y=105,label=paste(Freq,"genes")))+
+  theme_bw()+ 
+  theme(panel.grid.major.x=element_blank(),legend.position="none")
+dev.off()
+
+#For the Host.
+library(ggplot2)
+Varpart<-read.table(file="Varpart_Host-combined_formated.tab",sep="\t",h=T)
+Varpart2<-Varpart[,2:101]
+Varpart3<-data.frame(Gene=sub("_(Islands|PocilloGG|SymbioGG)","",rownames(Varpart2)),Variable=sub(".*_","",rownames(Varpart2)),VarianceMedian=apply(Varpart2,1,median),sd=apply(Varpart2,1,sd),Q1=apply(Varpart2,1,function(x){quantile(x,probs = 0.25)}),Q3=apply(Varpart2,1,function(x){quantile(x,probs = 0.75)}),row.names = NULL)
+Varpart3<-Varpart3[order(Varpart3$VarianceMedian,decreasing = T),]
+Varpart3$Gene<-factor(Varpart3$Gene,levels=unique(Varpart3$Gene))
+
+pdf(file="VariancePartitionHost_batchcorrected_I04corrected.pdf",width=9)
+ggplot(Varpart3[Varpart3$VarianceMedian>=0.5,])+ 
+  geom_violin(scale = "count",size=0.1,aes(x=Variable,y=VarianceMedian*100,fill=Variable))+ 
+  geom_boxplot(width=0.05,fill="grey60",size=0.1,aes(x=Variable,y=VarianceMedian*100))+
+  scale_fill_manual(values=set[1:3])+
+  scale_x_discrete(expand=c(0,0))+
+  geom_text(data=data.frame(table(Varpart3[Varpart3$VarianceMedian>=0.5,2])),aes(x=Var1,y=105,label=paste(Freq,"genes")))+
+  theme_bw()+ 
+  theme(panel.grid.major.x=element_blank(),legend.position="none")
+dev.off()
+
+```
