@@ -14,11 +14,13 @@ Concatenation of output files
 Conversion of Varpart_Symbiont-combined.tab file into table with R (lot of memory required). 
 Similar commands for the host.
 
-`r
+```r
+{
 library(data.table)
 library(reshape2)
 tab<-fread("Varpart_Symbiont-combined.tab",h=F,sep="\t")
 tab2<-acast(tab,V1+V2~V4,fill=0,fun.aggregate=mean,value.var="V3")
 tab3<-tab2[grep("Residuals",rownames(tab2),invert=T),]
 write.table(tab3,file="Varpart_Symbiont-combined_formated.tab",sep="\t",quote=F)
-`
+}
+```
