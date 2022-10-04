@@ -1,9 +1,9 @@
 # Variance partitioning
 
 To obtain Figure 3 of the article required files are :  
--the associations between host, symbiont and island : Variables11Islands.txt in this directory
--normalized gene expression for the host: Pocillopora_MetaT_TPM.tab available at https://doi.org/10.5281/zenodo.6341761 
--normalized gene expression for the symbiont: CladocopiumC1_MetaT_TPM.tab available at https://doi.org/10.5281/zenodo.6341761
+-the associations between host, symbiont and island : Variables11Islands.txt in this directory  
+-normalized gene expression for the host: Pocillopora_MetaT_TPM.tab available at https://doi.org/10.5281/zenodo.6341761  
+-normalized gene expression for the symbiont: CladocopiumC1_MetaT_TPM.tab available at https://doi.org/10.5281/zenodo.6341761  
 
 The R script VariancePartition_subsampling.R execute variance partition 5 times with a random subsampling of 2 samples.  
 To get 100 different subsampling, the following command was performed 22 times.
