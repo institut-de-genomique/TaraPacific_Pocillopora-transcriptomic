@@ -11,7 +11,7 @@ Concatenation of output files
 `cat Varpart_Host_rep10_* | awk '$4>0&&$1!="Gene"{print $0}' > Varpart_Host-combined.tab`
 
 
-Conversion of Varpart_Symbiont-combined.tab file into table with R (lot of memory required)
+Conversion of Varpart_Symbiont-combined.tab file into table with R (lot of memory required). 
 Similar commands for the host.
 
 `library(data.table)
