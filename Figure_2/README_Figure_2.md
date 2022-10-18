@@ -9,10 +9,8 @@ ITS2 profil abundances in each colony is in : TARA_PACIFIC_METAB_ITS2_coral_its2
 
 The analysis of the table on R to produce Supplementary Figure 4 is below
 ```{r}
-#Required libraries
-library(reshape2)
+#Required library
 library(ggplot2)
-library(RColorBrewer)
 
 ITS2<-read.table("TARA_PACIFIC_METAB_ITS2_coral_its2_type_profiles_absolute_abund_and_meta_v1.csv",sep=",",check.names = F,h=T)
 #columns and lignes selection
@@ -21,9 +19,9 @@ ITS2<-ITS2[7:nrow(ITS2),]
 colnames(ITS2)[2]<-"TaraSampleName"
 
 #Addition of concatenated sample Names
-Variables<-read.table("Variables11Islands.txt",sep="\t",h=T)
-Variables<-Variables[,c("Samples","TaraSampleName")]
-tab<-merge(Variables,ITS2,by="TaraSampleName")
+Corres<-read.table("Variables11Islands.txt",sep="\t",h=T)
+Corres<-Corres[,c("Samples","TaraSampleName")]
+tab<-merge(Corres,ITS2,by="TaraSampleName")
 
 #conversion in column format with column names
 tab2<-melt(tab,id.vars = colnames(tab[,1:3]), measure.vars = colnames(tab[,4:ncol(tab)]))
