@@ -64,3 +64,6 @@ ggplot(tab3,aes(x=SiteColo,y=Value,fill=Type))+
   guides(fill=guide_legend(ncol=1))
 dev.off()
 ```
+## 2. Using psbA<sup>ncr</sup> sequences  
+
+## 3. Using SNVs identified on transcriptomic reads.  
