@@ -7,7 +7,7 @@ ITS2 sequences were obtained following the procedure detailed here : https://arx
 ITS2 sequences were processed with the Symportal pipeline and the results are available here : https://doi.org/10.5281/zenodo.4061796  
 ITS2 profil abundances in each colony is in : TARA_PACIFIC_METAB_ITS2_coral_its2_type_profiles_absolute_abund_and_meta_v1.csv  
 
-The analysis of the table on R to produce Supplementary Figure 4 is below  
+The R code to produce Supplementary Figure 4 is below  
 ```{r}
 #Required library
 library(ggplot2)
