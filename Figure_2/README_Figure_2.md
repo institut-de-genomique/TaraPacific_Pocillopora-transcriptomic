@@ -8,7 +8,7 @@ ITS2 sequences were processed with the Symportal pipeline and the results are av
 ITS2 profil abundances in each colony is in : TARA_PACIFIC_METAB_ITS2_coral_its2_type_profiles_absolute_abund_and_meta_v1.csv  
 
 The R code to produce Supplementary Figure 4 is below  
-```{r}
+```r
 #Required library
 library(ggplot2)
 
