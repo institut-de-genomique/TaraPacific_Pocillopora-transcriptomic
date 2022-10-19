@@ -3,7 +3,7 @@ We used three independant methodes to identify Cladocopium lineages.
 
 ## 1. Using ITS2 sequences  
 
-ITS2 sequences were obtained following the procedure detailed here : https://arxiv.org/abs/2207.02475  
+ITS2 sequences are available under the PRJEB52458 project and were obtained following the procedure detailed here : https://arxiv.org/abs/2207.02475  
 ITS2 sequences were processed with the Symportal pipeline and the results are available here : https://doi.org/10.5281/zenodo.4061796  
 ITS2 profil abundances in each colony is in : TARA_PACIFIC_METAB_ITS2_coral_its2_type_profiles_absolute_abund_and_meta_v1.csv  
 
