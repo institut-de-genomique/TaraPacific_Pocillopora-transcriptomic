@@ -1,7 +1,8 @@
 # Identifications of Cladocopium lineages 
 We used three independant methodes to identify Cladocopium lineages.  
 
-## 1. Using ITS2 sequences  
+## 1. Using ITS2 sequences 
+### A. Barplot of ITS2 profiles (Supplementary Figure X) 
 
 ITS2 sequences are available under the PRJEB52458 project and were obtained following the procedure detailed here : https://arxiv.org/abs/2207.02475  
 ITS2 sequences were processed with the Symportal pipeline and the results are available here : https://doi.org/10.5281/zenodo.4061796  
@@ -64,6 +65,104 @@ ggplot(tab3,aes(x=SiteColo,y=Value,fill=Type))+
   guides(fill=guide_legend(ncol=1))
 dev.off()
 ```
-## 2. Using psbA<sup>ncr</sup> sequences  
 
-## 3. Using SNVs identified on transcriptomic reads.  
+### Hierarchical clustering of Samples ITS2 distances (Figure 1B)
+
+#Genetic clades for the host and the symbiont based on the SNP.
+
+```r
+Variable<-read.table("Variables11Islands.txt",sep="\t",h=T)
+
+#Distance between samples based on ITS2 sequences.
+library(vegan)
+library(RColorBrewer)
+library(ape)
+library(ggrepel)
+colors<-brewer.pal(8,"Set1")
+pal<-colorRampPalette(colors)
+set<-sample(pal(10),replace = F)
+
+#Distance table
+tab<-read.table("TARA_PACIFIC_METAB_ITS2_coral_between_sample_distances_C_braycurtis_distances_sqrt_v1.dist",sep="\t",h=F)
+#Selection of Pocillopora samples from the 11 first islands.
+tab2<-tab[tab$V1%in%Variable$TaraSampleName,c(TRUE,TRUE,tab$V1%in%Variable$TaraSampleName)]
+colnames(tab2)<-c("TaraSampleName","Id",tab2$V1)
+#Addition of SampleNames
+tab2<-merge(Variable[,c("Samples","TaraSampleName")],tab2,by.x="TaraSampleName",by.y="TaraSampleName")
+rownames(tab2)<-tab2$TaraSampleName
+
+#Conversion in matrix 
+mat<-as.matrix(tab2[,4:ncol(tab2)])
+mat<-mat[,rownames(mat)]
+
+#Addition of Sample names
+rownames(mat)<-tab2$Samples
+colnames(mat)<-tab2$Samples
+
+#Elimination of samples containing 2 Cladocopium ITS2 profiles.
+GoodSamples<-Variable[!Variable$Sample%in%c("I10S01C006POC","I05S02C002POC"),1]
+mat2<-mat[rownames(mat)%in%GoodSamples,rownames(mat)%in%GoodSamples]
+
+#Hierarchical clustering of Samples ITS2 distances.
+
+dendITS<-hclust(as.dist(mat2),method = "average") 
+dendITS2 <- as.dendrogram(dendITS) %>%
+  set("labels_cex", c(.5)) %>%
+  set("labels_cex", c(.5)) %>% 
+  set("branches_lwd",c(0.5)) %>%
+  set("labels_col",c("#117733", "#cc6677" ,"#44aa99", "#332288","#6699cc")[as.factor(unlist(lapply(dend$labels[dend$order],function(x){Variable[Variable$Samples==x,"SymbioGG"]})))]) 
+
+ggdendITS2 <- as.ggdend(dendITS2)
+
+
+#ggplot(ggdendITS2, horiz = TRUE, theme=NULL) + 
+  theme(axis.line.y=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank(),axis.line.x=element_line(color="black"),panel.background = element_blank())+
+  labs(y="",x="ITS2 dendrogram")
+```
+## 2. Using SNPs identified on transcriptomic reads (Figure 1A).  
+
+```r
+tab<-read.table("SNP-Filtering-Coverage-Biallelic-Population-Structure-DualT-Cladocopium-C1-CDS-All-Samples-Perform-Genotyping-Removed-D2-Biallelic-SQ-30-Frequency-NA-Filtering.txt",h=T,check.names = F)
+colnames(tab)<-sub("_.*","",colnames(tab))
+#Selection of 82 samples containing a single Cladocopium species.
+tab2<-tab[,colnames(tab)%in%Variable[Variable$Symbio_Genus=="C","Samples"]]
+dendSNP<-hclust(dist(t(tab2)),method = "ward.D2")
+
+#Optimal number of cluster
+library(factoextra)
+OptimalKGapSNP<-fviz_nbclust(tab2, hcut, method = "gap_stat",k.max=12,nboot=50) +
+  geom_vline(xintercept = 4, linetype = 2)+
+  labs(subtitle = "gap_stat method")
+
+ggplot(OptimalKGapSNP$data,aes(x=clusters,y=gap,group = 1))+
+  geom_point(size=2,alpha=0.5)+
+  geom_line()+
+  geom_errorbar(aes(ymin=ymin,ymax=ymax),width=0.2)+
+  geom_vline(xintercept = 5,linetype=2,color="red")+
+  theme_bw()
+
+dendSNP2 <- as.dendrogram(dendSNP) %>%
+  set("labels_cex", c(.5)) %>%
+  set("labels_cex", c(.5)) %>% 
+  set("branches_lwd",c(0.5)) %>%
+  set("labels_col",c("#117733", "#cc6677" ,"#44aa99", "#332288","#6699cc")[as.factor(unlist(lapply(dendSNP$labels[dendSNP$order],function(x){Variable[Variable$Samples==x,"SymbioGG"]})))]) 
+
+ggdendSNP2 <- as.ggdend(dendSNP2)
+
+#ggplot(ggdendSNP2, horiz = TRUE, theme=NULL) + 
+  theme(axis.line.y=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank(),axis.line.x=element_line(color="black"),panel.background = element_blank())+
+  labs(y="",x="SNPs dendrogram")
+
+
+#Ordered dendrogram according to Clado Lineages
+dendITS4 <-rotate(dendITS2,Variable[order(Variable$SymbioGG),"Samples"][Variable[order(Variable$SymbioGG),"Samples"]%in%labels(dendITS2)])
+dendSNP4 <-rotate(dendSNP2,Variable[order(Variable$SymbioGG),"Samples"][Variable[order(Variable$SymbioGG),"Samples"]%in%labels(dendSNP2)])
+  
+dendCombined<-dendlist(dendITS4, dendSNP4)
+pdf(file="combined_dendrogram.pdf",height=10,width=12)
+dend_diff(dendCombined)
+dev.off()
+```
+
+## 3. Using psbA<sup>ncr</sup> sequences (Figure 1C)
+
