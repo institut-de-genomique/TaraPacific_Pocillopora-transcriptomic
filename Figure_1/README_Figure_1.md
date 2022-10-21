@@ -170,21 +170,22 @@ We analyzed the non-coding region of the psbA gene (psbA<sup>ncr</sup>) to assig
 
 ### A. Identification of psbA<sup>ncr</sup> sequences in each _Pocillopora_ colonies  
 
-Extraction of psbAncr reads from 82 Pocillopra samples
-Require bwa-mem2/2.2.1 and samtools/1.15.1
+Alignement of meatgenomic reads from 82 _Pocillopra_ samples on 3 psbA<sup>ncr</sup> sequences 
+Metagenomic fastq files are available at the ENA under project PRFNA PRJEB47249
 
-<code>
+Require bwa-mem2/2.2.1 and samtools/1.15.1  
+
+The following command should be executed on each metagenomic readset.
+```bash
 bwa-mem2 index psbA_Cladocopium.fa
-cat ReadsetsPOC_MetaG.list | while read a b c ;do jobify -b -q normal -c 4 -t 4:00:00 "bwa-mem2 mem -t 4 -M psbA_Cladocopium.fa ${b} ${c} | samtools view -b -@ 4 -F 4 - -o ${a}_PsBA.aln.bam";done
+bwa-mem2 mem -t 4 -M psbA_Cladocopium.fa read1.fastq read2.fastq | samtools view -b -@ 4 -F 4 - -o SAMPLE_PsBA.aln.bam"
+perl /env/cns/proj/projet_CNM/script/Quentin/BamFiltration.pl -in SAMPLE_PsBA.aln.bam -out SAMPLE_PsBA.aln.filtered100-90.bam -minPCaligned 100 -minPCidentity 90
+```
+Count of number of reads aligned on each psbA<sup>ncr</sup> sequence  
+```
+for i in *_PsBA.aln.filtered100-90.bam ;do echo -ne "$i\t" ;samtools view $i | awk '{print $3}' | sort | uniq -c | sort -nrk1,1 |head -1 | awk '{print $2"\t"$1}' ;done > Summary_mapping_Cladocopium100-90.tab
+```
 
-for i in *_PsBA.aln.bam ;do jobify -b -q normal -c 1 -t 1:00:00 perl /env/cns/proj/projet_CNM/script/Quentin/BamFiltration.pl -in $i -out ${i%.bam}.filtered100-90.bam -minPCaligned 100 -minPCidentity 90; d
-one
-
-for i in *_PsBA.aln.filtered.bam ;do echo -ne "$i\t" ;samtools view $i | awk '{print $3}' | sort | uniq -c | sort -nrk1,1 |head -1 | awk '{print $2"\t"$1}' ;done > Bilan_mapping_Cladocopium100-90.tab
-</code>
-
-       
-       
 #Manual curation of Bilan file (to remove not analyzed samples).
 cat Bilan_mapping_Cladocopium100-90.tab | while read a b c ;do jobify -b -q normal -c 1 -t 1:00:00 samtools sort -o ${a%.bam}.sort.bam $a; done
 for i in *_PsBA.aln.filtered100-90.sort.bam ;do jobify -b -q normal -c 1 -t 1:00:00 samtools index $i; done
