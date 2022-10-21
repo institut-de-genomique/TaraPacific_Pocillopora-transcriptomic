@@ -57,18 +57,16 @@ set<-c("#3a867c","#3a9a7c",
        "#4e9af5",
        "#E41A1C","#ee1a1c","#f81a1c","#ff1a1c")
 
-pdf(file="ITS2_type2_Pocillopora.pdf",width=12)
 ggplot(tab3,aes(x=SiteColo,y=Value,fill=Type))+
   geom_bar(stat="identity",position="fill")+
   scale_fill_manual(values=set)+
   facet_grid(.~Island,scale="free",space="free")+  theme(axis.text.x=element_text(angle=90),panel.grid=element_blank(),axis.ticks.x=element_blank(),panel.background=element_blank(),axis.line=element_blank(),legend.key.size=unit(2,"mm"))+
   guides(fill=guide_legend(ncol=1))
-dev.off()
 ```
 
 ### Hierarchical clustering of Samples ITS2 distances (Figure 1B)
 
-#Genetic clades for the host and the symbiont based on the SNP.
+Genetic clades for the host and the symbiont based on the SNP.
 
 ```r
 Variable<-read.table("Variables11Islands.txt",sep="\t",h=T)
@@ -114,8 +112,7 @@ dendITS2 <- as.dendrogram(dendITS) %>%
 
 ggdendITS2 <- as.ggdend(dendITS2)
 
-
-#ggplot(ggdendITS2, horiz = TRUE, theme=NULL) + 
+ggplot(ggdendITS2, horiz = TRUE, theme=NULL) + 
   theme(axis.line.y=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank(),axis.line.x=element_line(color="black"),panel.background = element_blank())+
   labs(y="",x="ITS2 dendrogram")
 ```
@@ -166,7 +163,7 @@ dev.off()
 
 ## 3. Analysis of psbA<sup>ncr</sup> sequences in _Pocillopora_ samples
 
-We analyzed the non-coding region of the psbA gene (psbA<sup>ncr</sup>) to assign _Cladocopium_ lineages to known _Cladocopium_ species following the method used in Johnston et al 2022 and Turnham et al 2021. The code below describes : (A) The mapping of metagenomic reads of the 82 _Pocillopora_ corals containing Cladocopium symbionts on 3 psbAncr sequences (C. latusorum MW819767.1, C. pacificum MW861717, and C. goreaui KF572161.1) the build of consensus sequences for each sample. (B) The alignement then construction of Bayesian phylogeny using 2 psbA<sup>ncr</sup> sequences for each Cladocopium clade identified in Johnston et al 2022 and and the 82 consensus sequences. (C) The representation of the phylogeny with R.
+We analyzed the non-coding region of the psbA gene (psbA<sup>ncr</sup>) to assign _Cladocopium_ lineages to known _Cladocopium_ species following the method used in Johnston et al 2022 (https://pubmed.ncbi.nlm.nih.gov/35960256/) and Turnham et al 2021 (https://www.nature.com/articles/s41396-021-01007-8). The code below describes : (A) The mapping of metagenomic reads of the 82 _Pocillopora_ corals containing Cladocopium symbionts on 3 psbAncr sequences (C. latusorum MW819767.1, C. pacificum MW861717, and C. goreaui KF572161.1) the build of consensus sequences for each sample. (B) The alignement then construction of Bayesian phylogeny using 2 psbA<sup>ncr</sup> sequences for each Cladocopium clade identified in Johnston et al 2022 and and the 82 consensus sequences. (C) The representation of the phylogeny with R.
 
 ### A. Identification of psbA<sup>ncr</sup> sequences in each _Pocillopora_ colonies  
 
@@ -222,12 +219,7 @@ end;
 
 ### C. Tree representation on R (Figure 1C)
 
-################################
-##SymbioSpecies identification##
-################################
-#Johnston et al 2022: https://zenodo.org/record/6710608#.YxCxB7TP1aQ from https://pubmed.ncbi.nlm.nih.gov/35960256/
-#Tuhrnam et al 2021: Dataset 2 from https://www.nature.com/articles/s41396-021-01007-8
-#directory: /env/cns/proj/TaraPacific/scratch/METAT_WORK/Quentin/SymbioSpecies/
+
 
 setwd("/env/cns/proj/TaraPacifique/scratch/METAT_WORK/Quentin/SymbioSpecies/")
 library(ape)
