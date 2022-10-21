@@ -168,11 +168,11 @@ We analyzed the non-coding region of the psbA gene (psbA<sup>ncr</sup>) to assig
 ### A. Identification of psbA<sup>ncr</sup> sequences in each _Pocillopora_ colonies  
 
 Alignement of meatgenomic reads from 82 _Pocillopra_ samples on 3 psbA<sup>ncr</sup> sequences 
-Metagenomic fastq files are available at the ENA under project PRFNA PRJEB47249
+Metagenomic fastq files are available at the ENA under project PRJEB47249  
 
-Require bwa-mem2/2.2.1 and samtools/1.15.1  
+Required tools: bwa-mem2/2.2.1, samtools/1.15.1  
 
-The following command should be executed on each metagenomic readset.
+The following command should be executed on each metagenomic readset.  
 ```bash
 bwa-mem2 index psbA_Cladocopium.fa
 bwa-mem2 mem -t 4 -M psbA_Cladocopium.fa read1.fastq read2.fastq | samtools view -b -@ 4 -F 4 - -o SAMPLE_PsBA.aln.bam"
@@ -219,85 +219,21 @@ end;
 
 ### C. Tree representation on R (Figure 1C)
 
-
-
-setwd("/env/cns/proj/TaraPacifique/scratch/METAT_WORK/Quentin/SymbioSpecies/")
+```r
 library(ape)
 library(ggtree)
 
-#Test 1 Johnston tree
+#Phylogeny loading
+Tree<-ape::read.nexus("psbA-Cladocopium_Johnston2022.clustal.phylogeny.nexus")
+#Metadata on _Cladocopium_ lineages
+clade<-read.table("Variables11Islands.txt",h=T,sep="\t")
 
-Tree<-ape::read.nexus("psbA_Johnston2022.tree.nexus")
-
-Tree2<-root(Tree, node = 179)
-
-test<-as_tibble(Tree2)
-
-ggtree(Tree2,size=0.5,aes(x,y)) + 
-  geom_treescale()+
-  geom_text(aes(label=node), hjust=-.3,size=3)+
-  geom_nodepoint()+
-  geom_tiplab(size=3)+
-  theme_tree2()+
-  xlim(0,0.15)
-  
-
-theme(plot.margin = unit(c(10,10,10,10), "mm"))
-#as_ylab=
-############################
-#Test 2 Jonhnston alignment#
-############################
-setwd("/env/cns/proj/TaraPacifique/scratch/METAT_WORK/Quentin/SymbioSpecies/bin/")
-
-Tree<-ape::read.nexus("Figure5a-Cladocopium_psbA.nex.con.tre")
-
-pdf(file="Johnston-tree.pdf",height=12,width=9)
-ggtree(Tree,size=0.5,aes(x,y)) + 
-  geom_treescale()+
-  geom_text(aes(label=node), hjust=-.3,size=3)+
-  geom_nodepoint()+
-  geom_tiplab(size=2.5)+
-  theme_tree2()+
-  xlim(0,0.20)
-dev.off()
-
-####################
-library(ape)
-library(ggtree)
-
-clade<-read.table("/env/cns/proj/TaraPacifique/ARTICLES/MetaTArticle/ITS2-analysis/Variables11Islands.txt",h=T,sep="\t")
+#Elimination of samples containing _Durusdinium_
 clade<-clade[!(clade$SymbioGG%in%c("CD","D")),]
 
-psbA<-read.tree("All_psbA.aln.mpileup.consensus_woN_muscle.newick")
-plot(psbA)
-
-psbA<-root(psbA, node = 209)
-
-psbA2 <- groupOTU(psbA, split(clade$Sample,clade$Islands))
-
-
-ggtree(psbA2,size=0.5,aes(x,y))+ geom_treescale()+
-  geom_text(aes(label=node), hjust=-.3,size=3)+
-  geom_nodepoint() + 
-  geom_tiplab(size=3,aes(color=group))+
-  theme_tree2()+
-  xlim(0,20)
-
-
-############
-#johnston+TP
-############
-setwd("/env/cns/proj/TaraPacifique/scratch/METAT_WORK/Quentin/SymbioSpecies/bin/")
-
-Tree<-ape::read.nexus("All_psbA-Cladcopium100-90.aln.mpileup.consensus_woN_SelectedJohnston2022_clustal_simple.nexus1.con.tre")
-clade<-read.table("/env/cns/proj/TaraPacifique/ARTICLES/MetaTArticle/ITS2-analysis/Variables11Islands.txt",h=T,sep="\t")
-clade<-clade[!(clade$SymbioGG%in%c("CD","D")),]
-clade<-clade[!(clade$SymbioGG%in%c("CD","D")),]
-
-
+#To color leaves according to _Cladocopium_ lineages
 Tree2 <- groupOTU(Tree$con_50_majrule, split(clade$Sample,clade$SymbioGG))
 
-pdf(file="SelectedJohnston-tree_TP_Cladocopium100-90_clustal_1000000_linear.pdf",height=9,width=7)
 ggtree(Tree2,size=0.5,aes(x,y)) + 
   geom_treescale()+
   geom_tiplab(size=2,aes(color=group))+
@@ -306,31 +242,4 @@ ggtree(Tree2,size=0.5,aes(x,y)) +
   theme_tree2()+
   xlim(0,0.20)
 dev.off()
-
-pdf(file="SelectedJohnston-tree_TP_Cladocopium100-90_clustal_1000000_circular.pdf",height=10,width=10)
-ggtree(Tree2,size=0.5,aes(x,y),layout="circular") + 
-  geom_treescale()+
-  geom_tiplab(size=2.5,aes(color=group))+
-  scale_color_manual(values=c("red","#117733", "#cc6677" ,"#44aa99", "#332288","#6699cc"))+
-  geom_nodelab(size=2,aes(label=as.numeric(label)*100,x=x+0.20/100))+
-  theme_tree2()+
-  xlim(0,0.20)
-dev.off()
-
-
-install.packages("remotes")
-remotes::install_github("fmichonneau/phyloch")
-Tree<-phyloch::read.mrbayes("All_psbA-Cladocopium100-90.aln.mpileup.consensus_woN_SelectedJohnston2022_clustal.nexus1_simple.con.tre")
-clade<-read.table("/env/cns/proj/TaraPacifique/ARTICLES/MetaTArticle/ITS2-analysis/Variables11Islands.txt",h=T,sep="\t")
-clade<-clade[!(clade$SymbioGG%in%c("CD","D")),]
-clade<-clade[!(clade$SymbioGG%in%c("CD","D")),]
-Tree2 <- groupOTU(Tree, split(clade$Sample,clade$SymbioGG))
-
-ggtree(Tree,size=0.5,aes(x,y)) + 
-  geom_treescale()+
-  geom_tiplab(size=2.5)+
-  geom_text(aes(label=prob))+
-  theme_tree2()+
-  xlim(0,0.20)
-
-
+```
