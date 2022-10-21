@@ -168,24 +168,23 @@ dev.off()
 
 We analyzed the non-coding region of the psbA gene (psbA<sup>ncr</sup>) to assign _Cladocopium_ lineages to known _Cladocopium_ species following the method used in Johnston et al 2022 and Turnham et al 2021. The code below describes : (A) The mapping of metagenomic reads of the 82 _Pocillopora_ corals containing Cladocopium symbionts on 3 psbAncr sequences (C. latusorum MW819767.1, C. pacificum MW861717, and C. goreaui KF572161.1) the build of consensus sequences for each sample. (B) The alignement then construction of Bayesian phylogeny using 2 psbA<sup>ncr</sup> sequences for each Cladocopium clade identified in Johnston et al 2022 and and the 82 consensus sequences. (C) The representation of the phylogeny with R.
 
+### A. Identification of psbA<sup>ncr</sup> sequences in each _Pocillopora_ colonies  
 
-### A. Identification of psbA<sup>ncr</sup> sequences in each _Pocillopora_ colonies
+Extraction of psbAncr reads from 82 Pocillopra samples
+Require bwa-mem2/2.2.1 and samtools/1.15.1
 
-
-#1) Extraction of psbAncr reads from 82 Pocillopra samples
-#require bwa-mem2/2.2.1 and samtools/1.15.1
-#
-
+<code>
 bwa-mem2 index psbA_Cladocopium.fa
 cat ReadsetsPOC_MetaG.list | while read a b c ;do jobify -b -q normal -c 4 -t 4:00:00 "bwa-mem2 mem -t 4 -M psbA_Cladocopium.fa ${b} ${c} | samtools view -b -@ 4 -F 4 - -o ${a}_PsBA.aln.bam";done
 
 for i in *_PsBA.aln.bam ;do jobify -b -q normal -c 1 -t 1:00:00 perl /env/cns/proj/projet_CNM/script/Quentin/BamFiltration.pl -in $i -out ${i%.bam}.filtered100-90.bam -minPCaligned 100 -minPCidentity 90; d
 one
 
-for i in *_PsBA.aln.filtered.bam ;do echo -ne "$i\t" ;samtools view $i | awk '{print $3}' | sort | uniq -c | sort -nrk1,1 |head -1 | awk '{print $2"\t"$1}' ;done >
+for i in *_PsBA.aln.filtered.bam ;do echo -ne "$i\t" ;samtools view $i | awk '{print $3}' | sort | uniq -c | sort -nrk1,1 |head -1 | awk '{print $2"\t"$1}' ;done > Bilan_mapping_Cladocopium100-90.tab
+</code>
 
-Bilan_mapping_Cladocopium100-90.tab
-
+       
+       
 #Manual curation of Bilan file (to remove not analyzed samples).
 cat Bilan_mapping_Cladocopium100-90.tab | while read a b c ;do jobify -b -q normal -c 1 -t 1:00:00 samtools sort -o ${a%.bam}.sort.bam $a; done
 for i in *_PsBA.aln.filtered100-90.sort.bam ;do jobify -b -q normal -c 1 -t 1:00:00 samtools index $i; done
