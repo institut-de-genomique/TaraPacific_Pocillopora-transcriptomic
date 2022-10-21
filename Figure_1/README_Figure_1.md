@@ -201,27 +201,24 @@ for i in *_PsBA.aln.filtered100-90.sort.mpileup.consensus.fa;do echo -e ">${i%_*
 ### B. Multiple alignement and Bayesian phylogeny of psbA<sup>ncr</sup> sequences
 
 The multiple alignement is done with MegaX software (https://www.megasoftware.net/) using ClustalW method.  
-The result is a nexus alignment file All_psbA.aln.mpileup.consensus_woN_AllJohnston2022_muscle.nexus
+The result is a nexus alignment file All_psbA.aln.mpileup.consensus_woN_AllJohnston2022_muscle.nexus.
+The bayesian phylogeny is computed with MrByes (http://nbisweden.github.io/MrBayes/)
 
-#MrByes
-#installé en local : make --preset "current directory"
-#puis ./mb
-#ne fonctionne pas en sshell...
-#Fichier de cofig MrbayesCommands.nex
+Config file : MrbayesCommands.nex  
+```bash
 begin mrbayes;
    set autoclose=yes nowarn=yes;
-   execute All_psbA.aln.mpileup.consensus_woN_AllJohnston2022_muscle.nexus;
+   execute psbA-Cladocopium_Johnston2022.clustal.nexus;
    lset nst=6 rates=invgamma;
    prset brlenspr=clock:birthdeath;
-   mcmc nruns=1 ngen=1000000 samplefreq=100 printfreq=100 diagnfreq=1000 file=All_psbA.aln.mpileup.consensus_woN_AllJohnston2022_muscle.nexus1;
+   mcmc nruns=1 ngen=1000000 samplefreq=100 printfreq=100 diagnfreq=1000 file=psbA-Cladocopium_Johnston2022.clustal.phylogeny.nexus;
    sump;
    sumt;
 end;
-
-jobify -b -q normal -c 1 --mem="10G" ./mb -i MrbayesCommands.nex
-
-
-
+```
+```bash
+./mb -i MrbayesCommands.nex
+```
 
 ### C. Tree representation on R (Figure 1C)
 
