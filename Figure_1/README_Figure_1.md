@@ -144,16 +144,18 @@ ggplot(OptimalKGapSNP$data,aes(x=clusters,y=gap,group = 1))+
   geom_vline(xintercept = 5,linetype=2,color="red")+
   theme_bw()
 
-#Addition of 
+#Addition of tree features
 dendSNP2 <- as.dendrogram(dendSNP) %>%
   set("labels_cex", c(.5)) %>%
   set("labels_cex", c(.5)) %>% 
   set("branches_lwd",c(0.5)) %>%
   set("labels_col",c("#117733", "#cc6677" ,"#44aa99", "#332288","#6699cc")[as.factor(unlist(lapply(dendSNP$labels[dendSNP$order],function(x){Variable[Variable$Samples==x,"SymbioGG"]})))]) 
 
+#Conversion in ggplot format
 ggdendSNP2 <- as.ggdend(dendSNP2)
 
-#ggplot(ggdendSNP2, horiz = TRUE, theme=NULL) + 
+#Figure 1A
+ggplot(ggdendSNP2, horiz = TRUE, theme=NULL) + 
   theme(axis.line.y=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank(),axis.line.x=element_line(color="black"),panel.background = element_blank())+
   labs(y="",x="SNPs dendrogram")
 
@@ -163,9 +165,8 @@ dendITS4 <-rotate(dendITS2,Variable[order(Variable$SymbioGG),"Samples"][Variable
 dendSNP4 <-rotate(dendSNP2,Variable[order(Variable$SymbioGG),"Samples"][Variable[order(Variable$SymbioGG),"Samples"]%in%labels(dendSNP2)])
   
 dendCombined<-dendlist(dendITS4, dendSNP4)
-pdf(file="combined_dendrogram.pdf",height=10,width=12)
+#Figure 1A and 1B
 dend_diff(dendCombined)
-dev.off()
 ```
 
 ## 3. Analysis of psbA<sup>ncr</sup> sequences in _Pocillopora_ samples
