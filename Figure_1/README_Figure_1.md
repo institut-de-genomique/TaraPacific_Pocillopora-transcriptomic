@@ -181,54 +181,28 @@ bwa-mem2 index psbA_Cladocopium.fa
 bwa-mem2 mem -t 4 -M psbA_Cladocopium.fa read1.fastq read2.fastq | samtools view -b -@ 4 -F 4 - -o SAMPLE_PsBA.aln.bam"
 perl /env/cns/proj/projet_CNM/script/Quentin/BamFiltration.pl -in SAMPLE_PsBA.aln.bam -out SAMPLE_PsBA.aln.filtered100-90.bam -minPCaligned 100 -minPCidentity 90
 ```
-Count of number of reads aligned on each psbA<sup>ncr</sup> sequence  
-```
+To count the number of reads aligned on the most covered psbA<sup>ncr</sup> sequence:  
+```bash
 for i in *_PsBA.aln.filtered100-90.bam ;do echo -ne "$i\t" ;samtools view $i | awk '{print $3}' | sort | uniq -c | sort -nrk1,1 |head -1 | awk '{print $2"\t"$1}' ;done > Summary_mapping_Cladocopium100-90.tab
 ```
 
-#Manual curation of Bilan file (to remove not analyzed samples).
-cat Bilan_mapping_Cladocopium100-90.tab | while read a b c ;do jobify -b -q normal -c 1 -t 1:00:00 samtools sort -o ${a%.bam}.sort.bam $a; done
-for i in *_PsBA.aln.filtered100-90.sort.bam ;do jobify -b -q normal -c 1 -t 1:00:00 samtools index $i; done
+Sort and index of all bam files
+```bash
+cat Summary_mapping_Cladocopium100-90.tab | while read a b c ;do samtools sort -o ${a%.bam}.sort.bam $a; done
+for i in *_PsBA.aln.filtered100-90.sort.bam ;do samtools index $i; done
+```
 
-#Manual consensus
-cat Bilan_mapping_Cladocopium100-90.tab | while read a b c ;do jobify -b -q normal -c 1 -t 00:05:00 samtools mpileup -Aa -f psbA_Cladocopium.fa -r $b ${a%.bam}.sort.bam -o ${a%.bam}.sort.mpileup;done
-for i in *PsBA.aln.filtered100-90.sort.mpileup ;do jobify -b -q normal -c 1 -t 00:15:00 perl /env/cns/proj/TaraPacifique/bin/Quentin/MpileuptoConsensus3.pl -mpileup $i -Mincov 4 -out ${i}.consensus.fa;done
-
-#concat
+Build of consensus sequences for each sample
+```bash
+cat Bilan_mapping_Cladocopium100-90.tab | while read a b c ;do samtools mpileup -Aa -f psbA_Cladocopium.fa -r $b ${a%.bam}.sort.bam -o ${a%.bam}.sort.mpileup;done
+for i in *PsBA.aln.filtered100-90.sort.mpileup ;do perl /env/cns/proj/TaraPacifique/bin/Quentin/MpileuptoConsensus.pl -mpileup $i -Mincov 4 -out ${i}.consensus.fa;done
 for i in *_PsBA.aln.filtered100-90.sort.mpileup.consensus.fa;do echo -e ">${i%_*}"; tail -n +2 $i ;done > All_psbA-Cladocopium100-90.aln.mpileup.consensus.fa
+```
+### B. Multiple alignement and Bayesian phylogeny of psbA<sup>ncr</sup> sequences
 
-#OPTIONEL
-#Second mapping sur la ref sélectionnée.
-bwa-mem2 index C_goreauii_rt113_psbA.fa
-bwa-mem2 index C_latusorum_MW819767.1_Pal09_620_psbA.fa
-bwa-mem2 index C_pacificum_MW861717_psbA.fa
+The multiple alignement is done with MegaX software (https://www.megasoftware.net/) using ClustalW method.  
+The result is a nexus alignment file All_psbA.aln.mpileup.consensus_woN_AllJohnston2022_muscle.nexus
 
-cat ReadsetsPOC_MetaG.list | while read a b c ;do REF=`grep ${a} Bilan_mapping_CladocopiumBis2.tab | awk '{print $2}'`; jobify -b -q normal -c 4 -t 4:00:00 "bwa-mem2 mem -t 4 ${REF}.fa ${b} ${c} | samtools
- view -b -@ 4 -F 4 - -o ${a}_${REF}_2ndMapping.aln.bam";done
-
-
-for i in *_psbA_2ndMapping.aln.bam ;do jobify -b -q normal -c 1 -t 1:00:00 samtools sort -o ${i%.bam}.sort.bam $i; done
-for i in *_psbA_2ndMapping.aln.sort.bam ;do jobify -b -q normal -c 1 -t 00:05:00 samtools index $i; done
-for i in *_psbA_2ndMapping.aln.sort.bam ;do jobify -b -q normal -c 1 -t 00:05:00 samtools mpileup -Aa -f psbA_Cladocopium.fa $i -o ${i%.bam}.mpileup;done
-for i in *_psbA_2ndMapping.aln.sort.bam ;do jobify -b -q normal -c 1 -t 00:15:00 perl /env/cns/proj/TaraPacifique/bin/Quentin/MpileuptoConsensus3.pl -mpileup ${i%.bam}.mpileup -Mincov 2 -out ${i%.bam}.mpil
-eup.consensus.fa;done
-
-#concat
-for i in *_psbA_2ndMapping.aln.sort.mpileup.consensus.fa;do echo -e ">${i%_*}"; tail -n +2 $i ;done > All_psbA-CladocopiumV3.aln.mpileup.consensus.fa
-
-#module load bcftools/1.15
-for i in *_PsBA.aln.filtered.sort.bam;do jobify -b -q normal -c 1 "bcftools mpileup -ABOu -f psbA_C.pacificum.fa $i | bcftools call --ploidy 1 -mv -Oz -o ${i%.bam}.call.vcf.gz;bcftools norm -f psbA_C.pacif
-icum.fa ${i%.bam}.call.vcf.gz -Ob -o ${i%.bam}.call.norm.bcf;bcftools filter --IndelGap 0 ${i%.bam}.call.norm.bcf -Ob -o ${i%.bam}.calls.norm.flt-indels.bcf;bcftools index ${i%.bam}.calls.norm.flt-indels.b
-cf;cat psbA_C.pacificum.fa | bcftools consensus -M n -a N ${i%.bam}.calls.norm.flt-indels.bcf > ${i%.bam}.consensus.fa";done
-
-
-
-for i in *_PsBA.aln.filtered.sort.bam;do jobify -b -q normal -c 1 "bcftools mpileup -A -f psbA_Cladocopium.fa $i | bcftools call -c | vcfutils.pl vcf2fq -Q 0 -l 0 -d 0 > ${i%.sort.bam}.bcftools-consensus.f
-a";done
-
-#####################
-#Phylogeny Revision##
-#####################
 #MrByes
 #installé en local : make --preset "current directory"
 #puis ./mb
@@ -247,7 +221,7 @@ end;
 jobify -b -q normal -c 1 --mem="10G" ./mb -i MrbayesCommands.nex
 
 
-### B. Bayesian phylogeny of psbA<sup>ncr</sup> sequences
+
 
 ### C. Tree representation on R (Figure 1C)
 
