@@ -132,6 +132,12 @@ tab2<-tab[,colnames(tab)%in%Variable[Variable$Symbio_Genus=="C","Samples"]]
 #Hierarchical clustering
 dendSNP<-hclust(dist(t(tab2)),method = "complete")
 
+#Write dendrogram in newick/nexus format
+library(ctc)
+library(ape)
+write(file="Cladocopium_SNP.dendrogram.newick",hc2Newick(dendSNP,flat=T))
+write.nexus(as.phylo(dendSNP), file="Cladocopium_SNP.dendrogram.nex")
+
 #Calculation of the optimal number of cluster
 library(factoextra)
 OptimalKGapSNP<-fviz_nbclust(tab2, hcut, method = "gap_stat",k.max=12,nboot=50) +
