@@ -1,0 +1,296 @@
+#############################################################################
+### Cahier / Notebook to align Cladocopium-C1 reference 	 	  ###
+### genome against Pocillopora meandrina - Tara Pacific - DualG		  ###
+### Author: Julie Lê-Hoang					  	  ###
+### Context: Thesis						   	  ###
+### Date: 06/02/2020						  	  ###	
+#############################################################################
+
+**************************************************************************
+************************ PART 1 : Some Statistics ************************
+**************************************************************************
+
+############
+## STEP 1 ##
+############
+## Load modules
+* Genoscope
+module unload mapping/snapshot
+module unload bwa
+module unload samtools
+module unload pysam
+module unload python
+module load python/2.7.8
+module load pysam/0.8.4
+module load bwa/0.7.15
+module load samtools
+module load commontools
+
+* CCRT
+module unload mapping/snapshot
+module unload bwa
+module unload samtools
+module unload pysam 
+module unload python
+module load pysam
+module load python
+module load bwa/0.7.15
+module load samtools/1.6
+module load commontools
+module load mapping
+module load extenv/ig
+module load extenv/fg
+
+############
+## STEP 2 ##
+############
+## Sam-carac, to have statistic view of reads
+ls *.aln.sort.bam | while read a ;do jobify -b -t 08:00:00 -c 5 "sam-carac -b $a -s allbest -a -p -o ${a%.bam}.carac"; done
+
+############
+## STEP 3 ##
+############
+# Calcul identity percent from sam-carac files
+ls *aln.sort.carac.stat | while read a; do jobify -b -t 01:00:00 -q small "python /env/cns/proj/TaraPacifique/bin/JulieL/program-jlehoang-Statistics-Alignment-Results-Reads.py $a ${a%_Cladocopium-C1-CDS-and-Durusdinium-D2-Transcriptome-DualT-Tara-DB.aln.sort.carac.stat}_Statistics-Alignment-Results-Reads.txt"; done
+
+############
+## STEP 3 ##
+############
+# R-code to do Histograms of the percentage identity
+install.packages("ggplot2")
+library(ggplot2)
+Samples.Files <- list.files(pattern = "Statistics-Alignment-Results-Reads")
+
+pdf(file = "Cladocopium-C1-genome-aligned-Pocillopora-samples-MetaT-Identity-Percent-Reads-Without-Rmdup.pdf", width = 14, height = 12)
+for (i in 1:length(Samples.Files)){
+  # Load data
+  mapC1 <- read.table(Samples.Files[i], header = TRUE, sep = "\t", stringsAsFactors = FALSE, quote = "")
+  Name.Samples <- sub("_.*","", Samples.Files[i])
+  
+  plot(ggplot(mapC1, aes(x = Identity))+geom_histogram(fill = "grey", col = "black", stat = "bin", binwidth = NULL, bins = 100)+labs(title = paste(Name.Samples, "Cladocopium C1 genome aligned - Identity Percent By Reads", sep = " "), y = "Reads Count", x = "Identity Percent"))
+}
+dev.off() 
+
+#############
+## STEP 4 ##
+#############
+# Removed Durusdinium in the samples
+ls *.aln.sort.98i-80l.bam | while read a ;do jobify -b -q small -t 05:00:00 "samtools view $a | grep "Cladocopium" | wc -l > ${a%.bam}-Nb-Reads-By-Samples-DualT-POC-C1-98i-80l.txt"; done
+
+# Group results
+jobify -b -q small -t 05:00:00 "cat *-Nb-Reads-By-Samples-DualT-POC-C1-98i-50l.txt > Nb-Reads-By-Samples-DualT-Pocillopora-Cladocopium-C1-98i-50l.txt"
+
+# Program
+jobify -b -q small "python /env/cns/proj/TaraPacifique/bin/JulieL/program-jlehoang-Format-Calcul-Reads.py DualT-Samples-Readsets-List-Consortium-POC-VF-Formated-Genoscope.txt Nb-Reads-By-Samples-DualT-Pocillopora-Cladocopium-C1-98i-80l.txt Format-Calcul-Reads-Nb-Reads-By-Samples-DualT-Pocillopora-Cladocopium-C1-98i-80l.txt 150 80040343"
+
+**************************************************************************
+************************ PART 1 : Some Statistics ************************
+**************************************************************************
+
+############
+## STEP 5 ##
+############
+# LOAD MODULES
+module load picard-tools/2.6.0
+module load extenv/fg
+module load extenv/ig
+module unload samtools
+module load mapping/snapshot
+module load bwa/0.7.15
+module load samtools/1.10.2
+module load gatk/3.7.0
+module load vcftools/0.1.12
+module load bcftools/1.10.2
+module load plink
+
+############
+## STEP 6 ##
+############
+# INDEX REFERENCE
+bwa index Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-with-taxonomic-affiliation-Tara-DB-Switch-Filter-90.fasta
+
+############
+## STEP 7 ##
+############
+## Alignment between Cladocopium-C1 reference transcriptome and Pocillopora meandrina - MetaT samples
+cat List-Samples-DualG-Pocillopora-Tara-Genoscope.txt | while read a b c; do jobify -c 6 -b -t 08:00:00 "bwa mem -t 6 -M Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-with-taxonomic-affiliation-Tara-DB-Switch-Filter-90.fasta $b $c | samtools view -b -@ 6 -F 4 /dev/stdin -o ${a}_Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-DualT-Tara-DB.aln.bam";done
+
+############
+## STEP 8 ##
+############
+## Samtools sort, to order reads
+ls *.aln.bam | while read a ;do jobify -b -c 8 -t 10:00:00 "samtools sort -@ 8 -o ${a%.bam}.sort.bam $a --reference Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-with-taxonomic-affiliation-Tara-DB-Switch-Filter-90.fasta"; done
+
+############
+## STEP 9 ##
+############
+# ADD READ GROUPS :  Make sure "RGSM" portion of code below matches real sample name, else trouble will ensue later!  You can do this using the following command:
+ls *.aln.sort.bam | while read a; do jobify -c 7 -t 01:00:00 -b "picard AddOrReplaceReadGroups I=$a O=${a%.bam}.rg.bam SO=coordinate RGID=id RGLB=library RGPL=platform RGPU=machine RGSM=${a%_Cladocopium-C1-CDS-Durusdinium-D2-transcriptome-CSW-Tara-DB.aln.sort.bam}" ; done
+
+ls *.aln.sort.bam | while read a; do jobify -c 7 -t 01:00:00 -b "picard AddOrReplaceReadGroups I=$a O=${a%.bam}.rg.bam SO=coordinate RGID=id RGLB=library RGPL=platform RGPU=machine RGSM=${a%_Cladocopium-C1-CDS-Durusdinium-D2-transcriptome-CSW-Symbio-Tara-DB.aln.sort.bam}" ; done
+
+#############
+## STEP 10 ##
+#############
+# FILTERING BAM FILES : Filter bam files based on mapped region length criteria with BamFilters:
+ls *.aln.sort.rg.bam | while read a ;do jobify -b -c 8 -t 15:00:00 "bamFilters -i 98 -a 80 -r 80 -n 30 -b $a -o ${a%.bam}.98i-80l.bam"; done
+
+#############
+## STEP 11 ##
+#############
+# INDEX BAM FILES
+ls *.sort.rg.98i-*l.bam | while read a ; do jobify -b -t 05:00:00 "samtools index $a" ;done
+
+#############
+## STEP 12 ##
+#############
+# Variant Calling with GATK
+# [General SNP Calling Pipeline](https://gencore.bio.nyu.edu/variant-calling-pipeline/)
+# [GATK Best Practices Pipeline](https://gatk.broadinstitute.org/hc/en-us/articles/360035890431-The-logic-of-joint-calling-for-germline-short-variants)
+
+#############
+## STEP 13 ##
+#############
+# Index Reference for use with GATK
+jobify -c 7 -t 24:00:00 -b "picard CreateSequenceDictionary R=Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-with-taxonomic-affiliation-Tara-DB-Switch-Filter-90.fasta O=Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-with-taxonomic-affiliation-Tara-DB-Switch-Filter-90.dict"
+
+# And with samtools
+jobify -c 4 -t 24:00:00 -b "samtools faidx Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-with-taxonomic-affiliation-Tara-DB-Switch-Filter-90.fasta"
+
+jobify -c 7 -t 24:00:00 -b "picard CreateSequenceDictionary R=Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-Tara-DB-Symbiodiniaceae-Switch-Filter-90.fasta O=Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-Tara-DB-Symbiodiniaceae-Switch-Filter-90.dict"
+
+jobify -c 4 -t 24:00:00 -b "samtools faidx Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-Tara-DB-Symbiodiniaceae-Switch-Filter-90.fasta"
+
+#############
+## STEP 14 ##
+#############
+/!\ À Faire au CCRT /!\
+# Create Realignment Targets : This is the first step in a two-step process of realigning around indels
+ls *sort.rg.98i-80l.bam | while read a; do jobify -c 7 -t 24:00:00 -b "gatk -T RealignerTargetCreator -R Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-with-taxonomic-affiliation-Tara-DB-Switch-Filter-90.fasta -I $a -o ${a%.bam}.realignment_targets.list"; done
+
+ls *sort.rg.98i-80l.bam | while read a; do jobify -c 7 -t 24:00:00 -b "gatk -T RealignerTargetCreator -R Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-Tara-DB-Symbiodiniaceae-Switch-Filter-90.fasta -I $a -o ${a%.bam}.realignment_targets.list"; done
+
+
+
+java -T RealignerTargetCreator -R Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-Tara-DB-Symbiodiniaceae-Switch-Filter-90.fasta -I I15S03C010S320_Cladocopium-C1-CDS-Durusdinium-D2-transcriptome-CSW-Symbio-Tara-DB.aln.sort.rg.98i-80l.bam -o test.realignment_targets.list
+
+#############
+## STEP 15 ##
+#############
+/!\ À Faire au CCRT /!\
+# Realign Indels : This step performs the realignment around the indels which were identified in the previous step (the ‘realignment targets’)
+ls *sort.rg.98i-80l.bam | while read a; do jobify -c 7 -t 24:00:00 -b -q broadwell "gatk -T IndelRealigner -R Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-with-taxonomic-affiliation-Tara-DB-Switch-Filter-90.fasta -I $a -targetIntervals ${a%.bam}.realignment_targets.list -o ${a%.bam}.realigned_reads.bam"; done
+
+#############
+## STEP 16 ##
+#############
+/!\ À Faire au CCRT /!\ ==> ETAPE TRES LONGUE
+# Call Variants on Individual Files (as gVCF in GATK v.3.7.0)
+ls *.sort.rg.98i-80l.realigned_reads.bam | while read a; do jobify -q xlarge -c 16 -t 96:00:00 --qos nolimit -b gatk -T HaplotypeCaller -R Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-with-taxonomic-affiliation-Tara-DB-Switch-Filter-90.fasta -nct 32 -ploidy 1 --emitRefConfidence GVCF -I $a -o ${a%.bam}.g.vcf;done
+
+#############
+## STEP 17 ##
+#############
+/!\ Filter les échantillons avec du Durusdinium ou autres Cladocopium avant l'étape d'après /!\
+/ccc/scratch/cont007/fg0076/lehoangj/CSW-GATK-Population-Structure-V2
+
+ls *.g.vcf | while read a; do jobify -b -t 02:00:00 "gzip $a"; done
+
+#############
+## STEP 17 ##
+#############
+/!\ À Faire au CCRT /!\
+# Merge gVCFs for each Island : Get all files associated to an island and ending with g.vcf and add --variant before them.
+samples=$(find . | grep 'I' | sed 's/.\///' | grep -E 'g.vcf$' | sed 's/^/--variant /')
+
+# Then merge :
+jobify -c 7 -t 24:00:00 -b gatk -T CombineGVCFs -R Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-with-taxonomic-affiliation-Tara-DB-Switch-Filter-90.fasta -o Population-Structure-DualT-CSW-Cladocopium-C1-CDS-and-Durusdinium-D2-Transcriptome-All-Samples-Merged.g.vcf  -V $(echo $samples)
+
+#############
+## STEP 18 ##
+#############
+/!\ À Faire au CCRT /!\
+# Perform joint genotyping (i.e., SNP Calling) on Island cohort gVCF files : Get all island cohort files ending with g.vcf for a species and add --variant before them:
+samples=$(find . | sed 's/.\///' | grep -E 'g.vcf$' | sed 's/^/--variant /')
+
+# Then perform joint genotyping on these files:
+jobify -c 14 -b -q broadwell -t 24:00:00 gatk -T GenotypeGVCFs -R Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-with-taxonomic-affiliation-Tara-DB-Switch-Filter-90.fasta -o Population-Structure-DualT-CSW-Cladocopium-C1-CDS-and-Durusdinium-D2-Transcriptome-All-Samples-Perform-Genotyping.vcf -V $(echo $samples)
+
+
+
+
+
+
+
+#############
+## STEP 19 ##
+#############
+# Removed Durusdinium D2
+jobify -b -t 02:00:00 "grep -v 'Durusdinium-D2-Ahyac_TaraDB-' Population-Structure-DualT-CSW-Cladocopium-C1-CDS-and-Durusdinium-D2-Transcriptome-All-Samples-Perform-Genotyping.vcf > Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Perform-Genotyping-Removed-D2.vcf"
+
+jobify -b -t 02:00:00 "grep -v 'Durusdinium-D2-Ahyac_TaraDB-' Population-Structure-DualT-CSW-Cladocopium-C1-CDS-and-Durusdinium-D2-Transcriptome-All-Samples-Merged.g.vcf > Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Merged-Removed-D2.vcf"
+
+#############
+## STEP 20 ##
+#############
+# Compressed results
+jobify -b "gzip Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Merged-Removed-D2.vcf"
+
+jobify -b "gzip Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Perform-Genotyping-Removed-D2.vcf"
+
+#############
+## STEP 21 ##
+#############
+# Filter VCF to Keep Only Biallelic SNPs
+jobify -b -c 12 "vcftools --gzvcf Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Perform-Genotyping-Removed-D2.vcf.gz --min-alleles 2 --max-alleles 2 --recode --recode-INFO-all --out Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Perform-Genotyping-Removed-D2-Biallelic.vcf"
+
+jobify -b -c 12 "vcftools --gzvcf Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Merged-Removed-D2.vcf.gz --min-alleles 2 --max-alleles 2 --recode --recode-INFO-all --out Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Merged-Removed-D2-Biallelic.vcf"
+
+#############
+## STEP 22 ##
+#############
+# Compressed results
+jobify -b "gzip Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Perform-Genotyping-Removed-D2-Biallelic.vcf"
+
+jobify -b "gzip Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Merged-Removed-D2-Biallelic.vcf"
+
+#############
+## STEP 23 ##
+#############
+jobify -b "bcftools view -i '%QUAL>=30' Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Perform-Genotyping-Removed-D2-Biallelic.vcf.gz -O z -o Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Perform-Genotyping-Removed-D2-Biallelic-SQ-30.vcf.gz"
+
+jobify -b "bcftools view -i '%QUAL>=30' Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Merged-Removed-D2-Biallelic.vcf.gz -O z -o Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Merged-Removed-D2-Biallelic-SQ-30.vcf.gz"
+
+#############
+## STEP 24 ##
+#############
+jobify -b "perl Pop-SNP_filtering.pl -in Population-Structure-DualT-Cladocopium-C1-CDS-All-Samples-Perform-Genotyping-Removed-D2-Biallelic-SQ-30.vcf.gz -MinCover 4 -out Population-Structure-DualT-Cladocopium-C1-CDS-All-Samples-All-Islands-Removed-D2-Biallelic-SQ-30"
+
+ls *-SQ-30.vcf | while read a; do jobify -b -t 03:00:00 -q small "python /env/cns/proj/TaraPacifique/bin/JulieL/program-jlehoang-SNP-Filtering-Coverage-Biallelic.py $a SNP-Filtering-Coverage-Biallelic-${a%.vcf}-Combined.txt SNP-Filtering-Coverage-Biallelic-${a%.vcf}-Frequency.txt SNP-Filtering-Coverage-Biallelic-${a%.vcf}-Coverage.txt 4 SNP-Filtering-Coverage-Biallelic-${a%.vcf}-Frequency-NA-Filtering.txt" ; done
+
+/env/cns/proj/TaraPacifique/scratch/METAT_WORK/JulieL/Population-Structure-Cladocopium-C1-CDS-Durusdinium-D2-Transcriptome/Population-Structure-C1-V4/SNP.tar.gz
+
+
+ls *SQ-30-Frequency.txt | while read a; do jobify -b -t 03:00:00 -q small "python /env/cns/proj/TaraPacifique/bin/JulieL/program-jlehoang-SNP-Filtering-Coverage-Biallelic-NA-Filtering-Frequency.py $a SNP-Filtering-Coverage-Biallelic-${a%.vcf}-NA-Filtered-Frequency.txt" ; done
+
+
+/env/cns/proj/TaraPacifique/scratch/METAT_WORK/JulieL/Alignment-BWA-Tara-Pacific-Samples/BWA-Alignment-CSW-Pocillopora-Samples-C1-CDS-and-D2-Transcriptome/Alignment.tar.gz
+
+
+
+/ccc/scratch/cont007/fg0076/lehoangj/CSW-GATK-Population-Structure-V2
+
+/ccc/scratch/cont007/fg0076/lehoangj/CSW-GATK-Population-Structure-V1/Results/Samples-Cladocopium
+
+###############
+## Important ##
+###############
+for i in `seq 5618879 5619009` ; do ccc_mdel $i;done
+
+ls *.txt | while read a; do jobify -b -t 02:00:00 -q small "gzip $a"; done
+
+ls *.gz | while read a; do jobify -b -t 02:00:00 -q small "gunzip $a"; done
+
+ls *Reference-Transcriptomes| while read a; do jobify -b -t 02:00:00 -q small "tar cfz ${a%}.tar.zip $a"; done
+
+ls * | while read a; do jobify -b -t 02:00:00 -q small "tar cfz C66-Trinity-Assembly-with-taxonomic-affiliation-Tara-DB.fasta.tar.zip $a"; done
