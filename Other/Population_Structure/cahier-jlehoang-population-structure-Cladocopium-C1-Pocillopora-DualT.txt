@@ -76,4 +76,4 @@ bcftools view -i '%QUAL>=30' Population-Structure-DualT-CSW-Cladocopium-C1-CDS-A
 #############
 ## STEP 24 ##
 #############
-ls *-SQ-30.vcf | while read a; do python /env/cns/proj/TaraPacifique/bin/JulieL/program-jlehoang-SNP-Filtering-NA-Coverage-Biallelic.py $a SNP-Filtering-Coverage-Biallelic-${a%.vcf}-Combined.txt SNP-Filtering-Coverage-Biallelic-${a%.vcf}-Frequency.txt SNP-Filtering-NA-Coverage-Biallelic-${a%.vcf}-Coverage.txt 4 SNP-Filtering-NA-Coverage-Biallelic-${a%.vcf}-Frequency-NA-Filtering.txt; done
+ls *-SQ-30.vcf | while read a; do jobify -b "python program-jlehoang-SNP-Filtering-Coverage-Biallelic-NA-Filtering-Frequency.py $a SNP-Filtering-Coverage-Biallelic-${a%.vcf}-Combined.txt SNP-Filtering-Coverage-Biallelic-${a%.vcf}-Frequency.txt SNP-Filtering-NA-Coverage-Biallelic-${a%.vcf}-Coverage.txt 10 SNP-Filtering-NA-Coverage-Biallelic-${a%.vcf}-Frequency-NA-Filtering.txt"; done
