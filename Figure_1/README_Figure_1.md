@@ -124,7 +124,7 @@ write.nexus(as.phylo(dendITS), file="Cladocopium_ITS2.dendrogram.nex")
 ## 2. Identification of _Cladocopium_ lineages with SNPs called on transcriptomic reads.  
 ### A. SNP calling
 
-### B. Hirarchical clustering of SNP frequencies (Figure 1A)
+### B. Hierarchical clustering of SNP frequencies (Figure 1A)
 
 ```r
 library(dendextend)
