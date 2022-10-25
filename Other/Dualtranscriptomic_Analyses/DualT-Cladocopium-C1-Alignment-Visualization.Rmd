@@ -1,0 +1,744 @@
+---
+title: "Cladocopium C1 CDS - 19.11.2020"
+author: "Julie Lê-Hoang"
+---
+
+# 1. Load data and packages
+
+## 1.1. Load Packages
+
+```{r}
+#install.packages("ggplot2")
+library("ggplot2")
+#install.packages("stringr", dependencies = TRUE)
+library("stringr")
+#install.packages("RColorBrewer")
+library("RColorBrewer")
+#install.packages("dplyr")
+library("dplyr")
+#install.packages("reshape2")
+library("reshape2")
+#install.packages("ggrepel")
+library("ggrepel")
+#install.packages("FactoMineR")
+library("FactoMineR")
+#install.packages("matrixStats")
+library("matrixStats")
+#install.packages("factoextra")
+library("factoextra")
+#install.packages("data.table")
+library("data.table")
+library("vegan")
+```
+
+## 1.2. Load Data
+
+```{r}
+myGroups <- c("Symbiodinium","Suessiales","Dinophyceae", "Ciliophora","Alveolata","Haptophyceae","Cryptophyta","Stramenopiles","Chlorophyta","Viridiplantae","Rhizaria","Bilateria","Amoebozoa","Cnidaria","Metazoa","Fungi","Eukaryota","Bacteria","root","cellularOrganisms","NoMatch","ID-NOT-FOUND")
+
+set<-c("#3EBF71", "#169749","#006F21","#004700","#001F00", "#AF0000", "#5FA6FF", "#D75718", "#BF3F00", "#FFCC00", "#B0B0FF","#8888E0","#6B60F1","#FFCC66","#FF0099","#000000","#505050","#A0A0A0", "#B7D84C","#F68D67", "#DFC297","#66C2A5")
+colorsTab <- as.data.frame(cbind(myGroups, set))
+
+mapC1.D2 <- read.table("DualT-Statistics-Alignment-Results-DualT-Samples-POC-C1-CDS-D2-transcriptome-98i-80l-Without-Rmdup.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE, quote = "")
+mapC1.D2 <- mapC1.D2[-which(mapC1.D2[,1]=="QuerySeqID"),]
+mapC1.D2 <- mapC1.D2[as.numeric(mapC1.D2$Identity) != 0.0,]
+mapC1.D2$Transcriptome<-sub("_.*","",mapC1.D2$QuerySeqID)
+mapC1.D2$Clade<-substr(mapC1.D2$QuerySeqID,1,1)
+mapC1.D2$Identity <- as.numeric(mapC1.D2$Identity)
+mapC1.D2$Coverage <- as.numeric(mapC1.D2$Coverage)
+mapC1.D2$Length <- as.numeric(mapC1.D2$Length)
+mapC1.D2$MapCount <- as.numeric(mapC1.D2$MapCount)
+mapC1.D2$Island <- substr(mapC1.D2$Origin, 1, 3)
+
+lineage1 <- str_split(mapC1.D2$QuerySeqID,"_",3)
+lineage2 <- c()
+myColors <- c()
+for (i in 1:length(lineage1)){
+  lineage2[i] = lineage1[[i]][2]
+  myColors[i] = as.character(colorsTab[as.numeric(grep(sub("TaraDB-", "",lineage1[[i]][2]), colorsTab$myGroups)),2])
+}
+
+mapC1.D2$Lineage <- sub("TaraDB-", "",lineage2)
+mapC1.D2$Lineage<-factor(mapC1.D2$Lineage,levels=c("Symbiodinium","Suessiales","Dinophyceae", "Ciliophora","Alveolata","Haptophyceae","Cryptophyta","Stramenopiles","Chlorophyta","Viridiplantae","Rhizaria","Bilateria","Amoebozoa","Cnidaria","Metazoa","Fungi","Eukaryota","Bacteria","root","cellularOrganisms","NoMatch","ID-NOT-FOUND"))
+mapC1.D2$Island <- substr(mapC1.D2$Origin, 1, 3)
+
+remove(lineage1)
+remove(lineage2)
+
+totalReads <- c(63354949, 54837832, 64188026, 53407075, 55819045, 46520593, 47876990, 52450678, 49586586, 47956640, 47360750, 51147196, 50981114, 48833160, 62890894, 47943566, 45552695, 65647042, 56941069, 72247454, 48062593, 64548215, 51943016, 55172021, 51906161, 43710453, 58402456, 51781650, 65694366, 77568771, 68277942, 50867250, 59808201, 50662331, 68046456, 79921392, 62353474, 38322995, 63102854, 60267471, 60121025, 71000556, 55896890, 64006405, 54002319, 41633954, 72582276, 52704756, 76300132, 59845448, 74184395, 66880872, 48076999, 46619570, 51824600, 40481288, 46210947, 48307139, 63742397, 54650322, 56556447, 75288472, 50979367, 57304101, 63575976, 70183186, 61956041, 80837952, 65336045, 51740254, 60761354, 55592319, 61685405, 64227908, 64287750, 74515652, 69583589, 67643301, 71890852, 66385070, 81016630, 99322421, 73275321, 83493121, 77186798, 55378121, 44391016, 51691769, 62471934, 57045287, 55942698, 49646669, 56716809, 53236513, 58050461, 97763610, 44711373, 44491639, 62281062, 51426018, 49258548, 53374943, 49589261)
+
+calcReads <- aggregate(as.numeric(mapC1.D2$MapCount), by = list(Origin=mapC1.D2$Origin, Transcriptome=mapC1.D2$Transcriptome), sum)
+calcReads$totalReads <- totalReads
+calcReads$Percent <- calcReads$x / totalReads * 100
+calcReads$Islands <- substr(calcReads$Origin, 1, 3)
+
+# Defined Population Structure
+G1 <- c("I04S01C001POC", "I04S01C006POC", "I04S01C010POC", "I04S02C001POC", "I04S02C006POC", "I04S02C010POC", "I04S03C001POC", "I04S03C006POC", "I04S03C010POC", "I04S04C001POC", "I04S04C006POC", "I04S04C010POC")
+
+G2 <- c("I05S01C010POC", "I05S02C006POC", "I05S02C010POC", "I06S01C001POC", "I06S01C006POC", "I06S02C001POC", "I06S02C006POC", "I06S03C001POC", "I06S03C006POC", "I06S03C010POC", "I07S03C010POC")
+
+G3 <- c("I05S03C001POC", "I05S03C006POC", "I07S01C001POC", "I07S01C006POC", "I07S01C010POC", "I07S02C001POC", "I07S02C006POC", "I07S03C001POC", "I07S03C006POC", "I08S01C001POC", "I08S01C010POC", "I08S02C001POC", "I08S03C001POC", "I08S03C010POC", "I09S01C001POC", "I09S02C001POC", "I09S02C006POC", "I09S02C010POC", "I09S03C006POC", "I10S02C010POC", "I15S01C006POC", "I15S01C010POC", "I15S02C001POC", "I15S03C001POC", "I15S03C010POC")
+
+G4 <- c("I05S01C001POC", "I05S01C006POC", "I05S03C010POC", "I06S01C010POC", "I06S02C010POC")
+
+G5 <- c("I01S02C001POC", "I01S02C006POC", "I01S03C006POC", "I01S03C010POC", "I02S02C001POC", "I02S02C010POC", "I03S01C013POC", "I03S01C017POC", "I03S01C018POC", "I03S01C019POC", "I07S02C010POC", "I08S01C006POC", "I08S02C006POC", "I08S02C010POC", "I08S03C006POC", "I09S01C006POC", "I09S01C010POC", "I09S03C001POC", "I09S03C010POC", "I10S01C001POC", "I10S01C010POC", "I10S02C001POC", "I10S02C006POC", "I10S03C001POC", "I10S03C006POC", "I10S03C010POC", "I15S01C001POC", "I15S02C006POC", "I15S03C006POC")
+
+mapC1.D2$Cladocopium <- rep("Not.Assigned", nrow(mapC1.D2))
+mapC1.D2[mapC1.D2$Origin%in%G1, c("Cladocopium")] <- "G1"
+mapC1.D2[mapC1.D2$Origin%in%G2, c("Cladocopium")] <- "G2"
+mapC1.D2[mapC1.D2$Origin%in%G3, c("Cladocopium")] <- "G3"
+mapC1.D2[mapC1.D2$Origin%in%G4, c("Cladocopium")] <- "G4"
+mapC1.D2[mapC1.D2$Origin%in%G5, c("Cladocopium")] <- "G5"
+
+# Defined Population Structure - Corals
+GNA <- c("I09S03C010POC", "I07S03C001POC", "I09S02C001POC")
+
+SVD1 <- c("I05S01C010POC", "I05S02C002POC", "I05S02C006POC", "I05S02C010POC", "I06S01C001POC", "I06S01C006POC", "I06S02C001POC", "I06S02C006POC", "I06S03C001POC", "I06S03C006POC", "I06S03C010POC", "I07S03C010POC")
+
+SVD2 <- c("I15S03C006POC", "I15S01C001POC", "I07S02C010POC", "I08S01C006POC", "I08S02C006POC", "I08S02C010POC", "I10S01C010POC", "I10S01C001POC", "I10S02C001POC", "I10S02C006POC", "I10S03C001POC", "I10S03C006POC", "I10S03C010POC", "I08S03C006POC", "I09S01C006POC", "I09S01C010POC", "I09S03C001POC", "I15S02C006POC")
+
+SVD3 <- c("I15S03C001POC", "I15S03C010POC", "I15S02C001POC", "I15S02C010POC", "I15S01C006POC", "I15S01C010POC", "I08S01C001POC", "I08S01C010POC", "I08S02C001POC", "I10S01C006POC", "I10S02C010POC", "I09S02C006POC", "I09S02C010POC", "I08S03C001POC", "I08S03C010POC", "I09S01C001POC", "I09S03C006POC")
+
+SVD4 <- c("I01S01C001POC", "I01S01C006POC", "I01S01C010POC", "I01S02C001POC", "I01S02C006POC", "I01S02C010POC", "I02S01C001POC", "I02S01C006POC", "I02S01C010POC", "I02S02C001POC", "I02S02C006POC", "I02S02C010POC", "I02S03C001POC", "I02S03C006POC", "I02S03C010POC", "I01S03C006POC", "I01S03C010POC", "I03S01C011POC", "I03S01C012POC", "I03S01C013POC", "I03S01C014POC", "I03S01C015POC", "I03S01C016POC", "I03S01C017POC", "I03S01C018POC", "I03S01C019POC", "I03S01C20POC","I05S01C001POC", "I05S01C006POC", "I05S03C010POC", "I06S01C010POC", "I06S02C010POC")
+
+SVD5 <- c("I04S01C001POC", "I04S01C006POC", "I04S01C010POC", "I04S02C001POC", "I04S02C006POC", "I04S02C010POC", "I04S03C001POC", "I04S03C006POC", "I04S03C010POC", "I04S04C001POC", "I04S04C006POC", "I04S04C010POC", "I07S01C001POC", "I07S01C006POC", "I07S01C010POC", "I07S02C001POC", "I07S02C006POC", "I07S03C006POC", "I05S03C001POC", "I05S03C006POC")
+
+mapC1.D2$Host.Pop <- rep("Host.Pop", nrow(mapC1.D2))
+mapC1.D2[mapC1.D2$Origin%in%SVD1, c("Host.Pop")] <- "SVD1"
+mapC1.D2[mapC1.D2$Origin%in%SVD2, c("Host.Pop")] <- "SVD2"
+mapC1.D2[mapC1.D2$Origin%in%SVD3, c("Host.Pop")] <- "SVD3"
+mapC1.D2[mapC1.D2$Origin%in%SVD4, c("Host.Pop")] <- "SVD4"
+mapC1.D2[mapC1.D2$Origin%in%SVD5, c("Host.Pop")] <- "SVD5"
+mapC1.D2[mapC1.D2$Origin%in%GNA, c("Host.Pop")] <- "Not.Assigned"
+```
+
+# 2. Merge data and calculs
+
+```{r}
+# Calcul
+tab<-aggregate(as.numeric(mapC1.D2$MapCount),by=list(Origin=mapC1.D2$Origin,Lineage=mapC1.D2$Lineage,Transcriptome=mapC1.D2$Transcriptome,Island=mapC1.D2$Island, Cladocopium=mapC1.D2$Cladocopium, Host.Pop = mapC1.D2$Host.Pop),sum)
+
+# Average Identity
+tabIdentity <- as.data.frame(aggregate(as.numeric(mapC1.D2$Identity),by=list(Origin=mapC1.D2$Origin,Lineage=mapC1.D2$Lineage,Transcriptome=mapC1.D2$Transcriptome,Island=mapC1.D2$Island, Cladocopium=mapC1.D2$Cladocopium, Host.Pop = mapC1.D2$Host.Pop),mean))
+
+# Tab Count reads
+tabCount <- as.data.frame(aggregate(as.numeric(mapC1.D2$MapCount),by=list(Origin=mapC1.D2$Origin,Lineage=mapC1.D2$Lineage,Transcriptome=mapC1.D2$Transcriptome,Island=mapC1.D2$Island, Cladocopium=mapC1.D2$Cladocopium, Host.Pop = mapC1.D2$Host.Pop),sum))
+
+# Average Coverage
+tabCoverage <- as.data.frame(aggregate(as.numeric(mapC1.D2$Coverage),by=list(Origin=mapC1.D2$Origin,Lineage=mapC1.D2$Lineage,Transcriptome=mapC1.D2$Transcriptome,Island=mapC1.D2$Island, Cladocopium=mapC1.D2$Cladocopium, Host.Pop = mapC1.D2$Host.Pop),mean))
+
+# Merge Data
+tab$Identity <- tabIdentity$x
+tab$Count <- tabCount$x
+tab$Coverage <- tabCoverage$x
+
+tabSym <- tab[grep("Symbiodinium",tab$Lineage),]
+```
+
+# 3. Number of reads aligned on Cladocopium C1 CDS and Durusdinium D2 transcriptome
+
+```{r}
+pdf(file = "Count-Reads-Cladocopium-C1-CDS-and Durusdinium-D2-transcriptome-aligned.pdf", width = 12, height = 16)
+ggplot(calcReads, aes(x = calcReads$Origin, y = calcReads$Percent))+geom_bar(stat = "identity", aes(fill = calcReads$Origin))+theme(legend.position = 'none')+labs(title = "Percentage of reads that mapped on Cladocopium C1 CDS", x = "Samples", y = "Percentage of reads")+coord_flip()+geom_text(data = calcReads, aes(y = 2, label = paste(round(calcReads$x, digits = 2),"aligned / ", round(calcReads$totalReads, digits = 2), "reads", sep = " ")), size = 4)+facet_grid(Islands~Transcriptome, scales = "free")
+
+ggplot(calcReads, aes(x = calcReads$Origin, y = calcReads$Percent))+geom_bar(stat = "identity", aes(fill = calcReads$Origin))+theme(legend.position = 'none')+labs(title = "Percentage of reads that mapped on Cladocopium C1 reference transcriptome", x = "Samples", y = "Percentage of reads")+coord_flip()+geom_text(data = calcReads, aes(y = 2, label = paste(round(calcReads$Percent, digits = 2), "%", sep = " ")), size = 4)+facet_grid(Islands~Transcriptome, scales = "free")
+dev.off()
+
+pdf(file = "Count-Reads-By-Lineage-Cladocopium-C1-CDS-and Durusdinium-D2-transcriptome-aligned.pdf", width = 12, height = 14)
+ggplot(tab)+geom_bar(aes(x=Origin, y=x, fill=Lineage), stat = "identity")+ coord_flip()+ scale_fill_manual(values = set, guide = guide_legend(nrow=3))+ labs(title = "Count reads - Cladocopium C1 CDS and Durusdinium D2 transcriptome", y = "Reads Count", x = "Samples")+ theme(strip.text.x = element_text(size = 10), axis.text.x = element_text(size = 9, angle = 45), axis.text.y = element_text(size = 7))+facet_grid(Island ~ Transcriptome, scales = "free_y", space = "free_y")+theme(legend.text=element_text(size = 8), legend.position = "bottom")
+
+ggplot(tab)+geom_bar(aes(x=Origin, y=x, fill=Lineage), stat = "identity", position = "fill")+coord_flip()+scale_fill_manual(values = set, guide = guide_legend(nrow=3))+labs(title = "Count reads - Cladocopium C1 CDS and Durusdinium D2 transcriptome", y = "Reads Count", x = "Samples")+theme(strip.text.x = element_text(size = 10), axis.text.x = element_text(size = 9, angle = 45), axis.text.y = element_text(size = 7))+facet_grid(Island ~ Transcriptome, scales = "free_y", space = "free_y")+theme(legend.text=element_text(size = 8), legend.position = "bottom")
+dev.off()
+```
+
+# 4. Identity - Number of reads aligned on Cladocopium C1 CDS and Durusdinium D2 transcriptome
+
+```{r}
+pdf(file = "Identity-Count-Reads-By-Lineage-Cladocopium-C1-CDS-and Durusdinium-D2-transcriptome-aligned.pdf", width = 12, height = 14)
+ggplot(tab)+geom_bar(aes(x=Origin, y=x, fill=Lineage), stat = "identity")+ coord_flip()+ scale_fill_manual(values = set, guide = guide_legend(nrow=3))+ labs(title = "Count reads - Cladocopium C1 CDS and Durusdinium D2 transcriptome", y = "Reads Count", x = "Samples")+theme(strip.text.x = element_text(size = 10), axis.text.x = element_text(size = 9, angle = 45), axis.text.y = element_text(size = 7))+facet_grid(Island ~ Transcriptome, scales = "free_y", space = "free_y")+theme(legend.text=element_text(size = 8), legend.position = "bottom")+geom_text(data = tabSym, aes(y = 2000000, label = paste(round(Identity, digits = 2),"% (", tabSym$Count,")",sep =""), x = Origin), size = 3)
+
+ggplot(tab)+geom_bar(aes(x=Origin, y=x, fill=Lineage), stat = "identity", position = "fill")+coord_flip()+scale_fill_manual(values = set, guide = guide_legend(nrow=3))+labs(title = "Count reads - Cladocopium C1 CDS and Durusdinium D2 transcriptome", y = "Reads Count", x = "Samples")+theme(strip.text.x = element_text(size = 10), axis.text.x = element_text(size = 9, angle = 45), axis.text.y = element_text(size = 7))+facet_grid(Island ~ Transcriptome, scales = "free_y", space = "free_y")+theme(legend.text=element_text(size = 8), legend.position = "bottom")+geom_text(data = tabSym, aes(y = 0.75, label = paste(round(Identity, digits = 2),"% (", tabSym$Count,")",sep =""), x = Origin), size = 3)
+dev.off()
+```
+
+# 5. Coverage - Number of reads aligned on Cladocopium C1 CDS and Durusdinium D2 transcriptome
+
+```{r}
+pdf(file = "Coverage-Count-Reads-By-Lineage-Cladocopium-C1-CDS-and Durusdinium-D2-transcriptome-aligned.pdf", width = 12, height = 14)
+ggplot(tab)+geom_bar(aes(x=Origin, y=x, fill=Lineage), stat = "identity")+coord_flip()+scale_fill_manual(values = set, guide = guide_legend(nrow=3))+labs(title = "Count reads - Cladocopium C1 CDS and Durusdinium D2 transcriptome", y = "Reads Count", x = "Samples")+theme(strip.text.x = element_text(size = 10), axis.text.x = element_text(size = 9, angle = 45), axis.text.y = element_text(size = 7))+facet_grid(Island ~ Transcriptome, scales = "free_y", space = "free_y")+theme(legend.text=element_text(size = 8), legend.position = "bottom")+geom_text(data = tabSym, aes(y = 2000000, label = paste(round(Coverage, digits = 2),"% (", tabSym$Count,")",sep =""), x = Origin), size = 3)
+
+ggplot(tab)+geom_bar(aes(x=Origin, y=x, fill=Lineage), stat = "identity", position = "fill")+coord_flip()+scale_fill_manual(values = set, guide = guide_legend(nrow=3))+labs(title = "Count reads - Cladocopium C1 CDS and Durusdinium D2 transcriptome", y = "Reads Count", x = "Samples")+theme(strip.text.x = element_text(size = 10), axis.text.x = element_text(size = 9, angle = 45), axis.text.y = element_text(size = 7))+facet_grid(Island ~ Transcriptome, scales = "free_y", space = "free_y")+theme(legend.text=element_text(size = 8), legend.position = "bottom")+geom_text(data = tabSym, aes(y = 0.75, label = paste(round(Coverage, digits = 2),"% (", tabSym$Count,")",sep =""), x = Origin), size = 3)
+dev.off()
+```
+
+# 6. Sere score
+
+## 6.1. Cladocopium C1
+
+```{r}
+source("sere.R")
+mapC1.D2$MapCount <- as.numeric(mapC1.D2$MapCount)
+mapC1.D2 <- mapC1.D2[order(mapC1.D2$QuerySeqID),]
+
+mapC1 <- mapC1.D2[grep("C1", mapC1.D2$Transcriptome),]
+dataAll.C1 <- acast(mapC1, QuerySeqID~Origin, fill=0, value.var="MapCount")
+
+# TPM 
+lengths <- mapC1[duplicated(mapC1$QuerySeqID)==F, 5]
+tabTPM.C1 <- t(t(dataAll.C1/(lengths/1000))/colSums(dataAll.C1/(lengths/1000)))*1000000
+
+# Pair by pair
+myList <- list()
+vec <- c()
+for (i in 1:ncol(tabTPM.C1)){
+  for (j in 1:ncol(tabTPM.C1)){
+    vec[j] <- sere.score(tabTPM.C1[,c(i,j)])
+  }
+  myList[[i]] <- vec
+}
+sereScoreTPM <- rbind(myList[[1]], myList[[2]], myList[[3]], myList[[4]], myList[[5]], myList[[6]], myList[[7]], myList[[8]], myList[[9]], myList[[10]], myList[[11]], myList[[12]], myList[[13]], myList[[14]], myList[[15]], myList[[16]], myList[[17]], myList[[18]], myList[[19]], myList[[20]], myList[[21]], myList[[22]], myList[[23]], myList[[24]], myList[[25]], myList[[26]], myList[[27]], myList[[28]], myList[[29]], myList[[30]], myList[[31]], myList[[32]], myList[[33]], myList[[34]], myList[[35]], myList[[36]], myList[[37]], myList[[38]], myList[[39]], myList[[40]], myList[[41]], myList[[42]], myList[[43]], myList[[44]], myList[[45]], myList[[46]], myList[[47]], myList[[48]], myList[[49]], myList[[50]], myList[[51]], myList[[52]], myList[[53]], myList[[54]], myList[[55]], myList[[56]], myList[[57]], myList[[58]], myList[[59]], myList[[60]], myList[[61]], myList[[62]], myList[[63]], myList[[64]], myList[[65]], myList[[66]], myList[[67]], myList[[68]], myList[[69]], myList[[70]], myList[[71]], myList[[72]], myList[[73]], myList[[74]], myList[[75]], myList[[76]], myList[[77]], myList[[78]], myList[[79]], myList[[80]], myList[[81]], myList[[82]], myList[[83]], myList[[84]], myList[[85]], myList[[86]], myList[[87]], myList[[88]], myList[[89]], myList[[90]], myList[[91]], myList[[92]], myList[[93]], myList[[94]], myList[[95]], myList[[96]], myList[[97]], myList[[98]], myList[[99]], myList[[100]], myList[[101]], myList[[102]], myList[[103]])
+colnames(sereScoreTPM) <- colnames(dataAll.C1)
+rownames(sereScoreTPM) <- colnames(dataAll.C1)
+round(sereScoreTPM, digit = 3)
+
+sere.score.POC <- print(sere.score(tabTPM.C1[,grep("I01", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I02", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I03", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I04", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I05", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I06", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I07", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I08", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I09", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I10", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I15", colnames(tabTPM.C1))]));
+                    
+                    print(sere.score(tabTPM.C1[,grep("I01S01", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I01S02", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I01S03", colnames(tabTPM.C1))]));
+                    
+                    print(sere.score(tabTPM.C1[,grep("I02S01", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I02S02", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I02S03", colnames(tabTPM.C1))]));
+                    
+                    print(sere.score(tabTPM.C1[,grep("I03S01", colnames(tabTPM.C1))]));
+                    
+                    print(sere.score(tabTPM.C1[,grep("I04S01", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I04S02", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I04S03", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I04S04", colnames(tabTPM.C1))]));
+                    
+                    print(sere.score(tabTPM.C1[,grep("I05S01", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I05S02", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I05S03", colnames(tabTPM.C1))]));
+                    
+                    print(sere.score(tabTPM.C1[,grep("I06S01", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I06S02", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I06S03", colnames(tabTPM.C1))]));
+                    
+                    print(sere.score(tabTPM.C1[,grep("I07S01", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I07S02", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I07S03", colnames(tabTPM.C1))]));
+                    
+                    print(sere.score(tabTPM.C1[,grep("I08S01", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I08S02", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I08S03", colnames(tabTPM.C1))]));
+                    
+                    print(sere.score(tabTPM.C1[,grep("I09S01", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I09S02", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I09S03", colnames(tabTPM.C1))]));
+                    
+                    print(sere.score(tabTPM.C1[,grep("I10S01", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I10S02", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I10S03", colnames(tabTPM.C1))]));
+                    
+                    print(sere.score(tabTPM.C1[,grep("I15S01", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I15S02", colnames(tabTPM.C1))]));
+                    print(sere.score(tabTPM.C1[,grep("I15S03", colnames(tabTPM.C1))]))
+
+myNames <- c(unique(substr(names(tabTPM.C1), 1, 3)),
+             unique(substr(names(tabTPM.C1), 1, 6)))
+
+srData <- data.frame(Islands = myNames, Sere = sere.score.POC)
+
+write.table(srData, file = "Sere-Scores-Cladocopium-C15.txt", quote = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
+
+
+# Raw data
+# Pair by pair
+myList <- list()
+vec <- c()
+for (i in 1:ncol(dataAll.C1)){
+  for (j in 1:ncol(dataAll.C1)){
+    vec[j] <- sere.score(dataAll.C1[,c(i,j)])
+  }
+  myList[[i]] <- vec
+}
+sereScoreRaw <- rbind(myList[[1]], myList[[2]], myList[[3]], myList[[4]], myList[[5]], myList[[6]], myList[[7]], myList[[8]], myList[[9]], myList[[10]], myList[[11]], myList[[12]], myList[[13]], myList[[14]], myList[[15]], myList[[16]], myList[[17]], myList[[18]], myList[[19]], myList[[20]], myList[[21]], myList[[22]], myList[[23]], myList[[24]], myList[[25]], myList[[26]], myList[[27]], myList[[28]], myList[[29]], myList[[30]], myList[[31]], myList[[32]], myList[[33]], myList[[34]], myList[[35]], myList[[36]], myList[[37]], myList[[38]], myList[[39]], myList[[40]], myList[[41]], myList[[42]], myList[[43]], myList[[44]], myList[[45]], myList[[46]], myList[[47]], myList[[48]], myList[[49]], myList[[50]], myList[[51]], myList[[52]], myList[[53]], myList[[54]], myList[[55]], myList[[56]], myList[[57]], myList[[58]], myList[[59]], myList[[60]], myList[[61]], myList[[62]], myList[[63]], myList[[64]], myList[[65]], myList[[66]], myList[[67]], myList[[68]], myList[[69]], myList[[70]], myList[[71]], myList[[72]], myList[[73]], myList[[74]], myList[[75]], myList[[76]], myList[[77]], myList[[78]], myList[[79]], myList[[80]], myList[[81]], myList[[82]], myList[[83]], myList[[84]], myList[[85]], myList[[86]], myList[[87]], myList[[88]], myList[[89]], myList[[90]], myList[[91]], myList[[92]], myList[[93]], myList[[94]], myList[[95]], myList[[96]], myList[[97]], myList[[98]], myList[[99]], myList[[100]], myList[[101]], myList[[102]], myList[[103]])
+colnames(sereScoreTPM) <- colnames(dataAll.C1)
+rownames(sereScoreTPM) <- colnames(dataAll.C1)
+round(sereScoreTPM, digit = 3)
+```
+
+## 6.2. Durusdinum D2
+
+```{r}
+mapD2 <- mapC1.D2[grep("D2", mapC1.D2$Transcriptome),]
+dataAll.D2 <- acast(mapD2, QuerySeqID~Origin, fill=0, value.var="MapCount")
+
+# TPM 
+lengths <- mapD2[duplicated(mapD2$QuerySeqID)==F, 5]
+tabTPM.D2 <- t(t(dataAll.D2/(lengths/1000))/colSums(dataAll.D2/(lengths/1000)))*1000000
+
+# Pair by pair
+myList <- list()
+vec <- c()
+for (i in 1:ncol(tabTPM.D2)){
+  for (j in 1:ncol(tabTPM.D2)){
+    vec[j] <- sere.score(tabTPM.D2[,c(i,j)])
+  }
+  myList[[i]] <- vec
+}
+sereScoreTPM <- rbind(myList[[1]], myList[[2]], myList[[3]], myList[[4]], myList[[5]], myList[[6]], myList[[7]], myList[[8]], myList[[9]], myList[[10]], myList[[11]], myList[[12]], myList[[13]], myList[[14]], myList[[15]], myList[[16]], myList[[17]], myList[[18]], myList[[19]], myList[[20]], myList[[21]], myList[[22]], myList[[23]], myList[[24]], myList[[25]], myList[[26]], myList[[27]], myList[[28]], myList[[29]], myList[[30]], myList[[31]], myList[[32]], myList[[33]], myList[[34]], myList[[35]], myList[[36]], myList[[37]], myList[[38]], myList[[39]], myList[[40]], myList[[41]], myList[[42]], myList[[43]], myList[[44]], myList[[45]], myList[[46]], myList[[47]], myList[[48]], myList[[49]], myList[[50]], myList[[51]], myList[[52]], myList[[53]], myList[[54]], myList[[55]], myList[[56]], myList[[57]], myList[[58]], myList[[59]], myList[[60]], myList[[61]], myList[[62]], myList[[63]], myList[[64]], myList[[65]], myList[[66]], myList[[67]], myList[[68]], myList[[69]], myList[[70]], myList[[71]], myList[[72]], myList[[73]], myList[[74]], myList[[75]], myList[[76]], myList[[77]], myList[[78]], myList[[79]], myList[[80]], myList[[81]], myList[[82]], myList[[83]], myList[[84]], myList[[85]], myList[[86]], myList[[87]], myList[[88]], myList[[89]], myList[[90]], myList[[91]], myList[[92]], myList[[93]], myList[[94]], myList[[95]], myList[[96]], myList[[97]], myList[[98]], myList[[99]], myList[[100]], myList[[101]], myList[[102]], myList[[103]])
+colnames(sereScoreTPM) <- colnames(dataAll.D2)
+rownames(sereScoreTPM) <- colnames(dataAll.D2)
+round(sereScoreTPM, digit = 3)
+
+# Raw data
+# Pair by pair
+myList <- list()
+vec <- c()
+for (i in 1:ncol(dataAll.D2)){
+  for (j in 1:ncol(dataAll.D2)){
+    vec[j] <- sere.score(dataAll.D2[,c(i,j)])
+  }
+  myList[[i]] <- vec
+}
+sereScoreRaw <- rbind(myList[[1]], myList[[2]], myList[[3]], myList[[4]], myList[[5]], myList[[6]], myList[[7]], myList[[8]], myList[[9]], myList[[10]], myList[[11]], myList[[12]], myList[[13]], myList[[14]], myList[[15]], myList[[16]], myList[[17]], myList[[18]], myList[[19]], myList[[20]], myList[[21]], myList[[22]], myList[[23]], myList[[24]], myList[[25]], myList[[26]], myList[[27]], myList[[28]], myList[[29]], myList[[30]], myList[[31]], myList[[32]], myList[[33]], myList[[34]], myList[[35]], myList[[36]], myList[[37]], myList[[38]], myList[[39]], myList[[40]], myList[[41]], myList[[42]], myList[[43]], myList[[44]], myList[[45]], myList[[46]], myList[[47]], myList[[48]], myList[[49]], myList[[50]], myList[[51]], myList[[52]], myList[[53]], myList[[54]], myList[[55]], myList[[56]], myList[[57]], myList[[58]], myList[[59]], myList[[60]], myList[[61]], myList[[62]], myList[[63]], myList[[64]], myList[[65]], myList[[66]], myList[[67]], myList[[68]], myList[[69]], myList[[70]], myList[[71]], myList[[72]], myList[[73]], myList[[74]], myList[[75]], myList[[76]], myList[[77]], myList[[78]], myList[[79]], myList[[80]], myList[[81]], myList[[82]], myList[[83]], myList[[84]], myList[[85]], myList[[86]], myList[[87]], myList[[88]], myList[[89]], myList[[90]], myList[[91]], myList[[92]], myList[[93]], myList[[94]], myList[[95]], myList[[96]], myList[[97]], myList[[98]], myList[[99]], myList[[100]], myList[[101]], myList[[102]], myList[[103]])
+colnames(sereScoreTPM) <- colnames(dataAll.D2)
+rownames(sereScoreTPM) <- colnames(dataAll.D2)
+round(sereScoreTPM, digit = 3)
+```
+
+# 7. PCA and Hclust
+
+## 7.1. Load Data
+
+```{r}
+colors <- c("#9E0142", "#F46D43", "#FEE08B", "#ABDDA4", "#3288BD", "#5E4FA2", "#C51B7D", "#4D9221", "#8C510A", "#CAB2D6", "#66C2A5", "#5E4FA2")
+conditionIsl <- c(rep("I01", 9), rep("I02", 9), rep("I03", 10), rep("I04", 12), rep("I05", 9), rep("I06", 9), rep("I07", 9), rep("I08", 9), rep("I09", 9), rep("I10", 9), rep("I15", 9))
+
+# Data modifications
+tabTPM.C1.matrix <- as.matrix(tabTPM.C1)
+conditionIsl <- rep(names(table(substr(colnames(tabTPM.C1.matrix), 1, 3))), table(substr(colnames(tabTPM.C1.matrix), 1, 3)))
+test <- data.frame(mapC1$Origin, mapC1$Cladocopium)
+Pop.select <- unique(test[order(test$mapC1.Origin, decreasing = FALSE),])
+conditionPop <- Pop.select$mapC1.Cladocopium
+names(conditionPop) <- Pop.select$mapC1.Origin
+test <- data.frame(mapC1$Origin, mapC1$Host.Pop)
+Pop.select <- unique(test[order(test$mapC1.Origin, decreasing = FALSE),])
+conditionPop.Corals <- Pop.select$mapC1.Host.Pop
+names(conditionPop.Corals) <- Pop.select$mapC1.Origin
+
+# Removed I04
+tabTPM.C1.matrix2 <- tabTPM.C1.matrix[,-grep("I04", colnames(tabTPM.C1.matrix))]
+conditionPop2 <- conditionPop[-grep("G1", conditionPop)]
+conditionIsl2 <- conditionIsl[-grep("I04", conditionIsl)]
+test <- data.frame(mapC1$Origin, mapC1$Host.Pop)
+Pop.select <- unique(test[order(test$mapC1.Origin, decreasing = FALSE),])
+Pop.select2 <- Pop.select[-grep("I04", Pop.select$mapC1.Origin),]
+conditionPop.Corals2 <- Pop.select2$mapC1.Host.Pop
+names(conditionPop.Corals2) <- Pop.select2$mapC1.Origin
+
+# Data modifications
+tabTPM.D2.matrix <- as.matrix(tabTPM.D2)
+conditionIsl <- rep(names(table(substr(colnames(tabTPM.D2.matrix), 1, 3))), table(substr(colnames(tabTPM.D2.matrix), 1, 3)))
+test <- data.frame(mapD2$Origin, mapD2$Cladocopium)
+Pop.select <- unique(test[order(test$mapD2.Origin, decreasing = FALSE),])
+conditionPop <- Pop.select$mapD2.Cladocopium
+names(conditionPop) <- Pop.select$mapD2.Origin
+test <- data.frame(mapD2$Origin, mapD2$Host.Pop)
+Pop.select <- unique(test[order(test$mapD2.Origin, decreasing = FALSE),])
+conditionPop.Corals <- Pop.select$mapD2.Host.Pop
+names(conditionPop.Corals) <- Pop.select$mapD2.Origin
+
+# Removed I04
+tabTPM.D2.matrix2 <- tabTPM.D2.matrix[,-grep("I04", colnames(tabTPM.D2.matrix))]
+conditionPop2 <- conditionPop[-grep("G1", conditionPop)]
+conditionIsl2 <- conditionIsl[-grep("I04", conditionIsl)]
+test <- data.frame(mapD2$Origin, mapD2$Host.Pop)
+Pop.select <- unique(test[order(test$mapD2.Origin, decreasing = FALSE),])
+Pop.select2 <- Pop.select[-grep("I04", Pop.select$mapD2.Origin),]
+conditionPop.Corals2 <- Pop.select2$mapD2.Host.Pop
+names(conditionPop.Corals2) <- Pop.select2$mapD2.Origin
+```
+
+## 7.2. Cladocopium - C1
+
+### 7.2.1. PCA
+
+```{r}
+# Figures : PCA TPM Islands Conditions
+pdf(file = "PCA-Cladocopium-C1-Pocillopora-TPM-SCALE-Islands-Conditions-With-Host.pdf", width = 12, height = 12)
+tabTPM.C1trans <- data.frame(t(t(scale(t(tabTPM.C1.matrix), scale = TRUE))), islands = conditionIsl)
+pca <- PCA(tabTPM.C1trans[,1:(ncol(tabTPM.C1trans)-1)], graph = FALSE, scale.unit = TRUE)
+pca.ind.coord.df <- data.frame(pca$ind$coord)
+pca.ind.coord.df$Pop <- conditionPop
+pca.ind.coord.df$Islands <- substr(rownames(pca.ind.coord.df),1,3)
+pca.ind.coord.df$Corals <- conditionPop.Corals
+
+for(i in 1:5){
+  for(j in 1:5){
+    if (i != j){
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = pca.ind.coord.df$Corals))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+geom_label_repel()+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Cladocopium C1", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = pca.ind.coord.df$Corals))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Cladocopium C1", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+    }
+  }
+}
+dev.off()
+
+# Figures : PCA TPM Islands Condition - Removed I04
+pdf(file = "PCA-Cladocopium-C1-Pocillopora-TPM-SCALE-Islands-Conditions-Removed-I04-With-Host.pdf", width = 12, height = 12)
+tabTPM.C1trans <- data.frame(t(t(scale(t(tabTPM.C1.matrix2), scale = FALSE))), islands = conditionIsl2)
+pca <- PCA(tabTPM.C1trans[,1:(ncol(tabTPM.C1trans)-1)], graph = FALSE, scale.unit = TRUE)
+pca.ind.coord.df <- data.frame(pca$ind$coord)
+pca.ind.coord.df$Pop <- conditionPop2
+pca.ind.coord.df$Islands <- substr(rownames(pca.ind.coord.df),1,3)
+
+for(i in 1:5){
+  for(j in 1:5){
+    if (i != j){
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = rownames(pca.ind.coord.df)))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+geom_label_repel()+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Cladocopium C1", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = rownames(pca.ind.coord.df)))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Cladocopium C1", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+    }
+  }
+}
+dev.off()
+
+
+# Figures : PCA TPM Populations Condition
+pdf(file = "PCA-Cladocopium-C1-Pocillopora-TPM-SCALE-Populations-Conditions-With-Host.pdf", width = 12, height = 12)
+dataAlltrans <- data.frame(t(t(scale(t(tabTPM.C1.matrix), scale = TRUE))), islands = conditionPop)
+pca <- PCA(dataAlltrans[,1:(ncol(dataAlltrans)-1)], graph = FALSE, scale.unit = TRUE)
+pca.ind.coord.df <- data.frame(pca$ind$coord)
+pca.ind.coord.df$Pop <- conditionPop
+pca.ind.coord.df$Islands <- substr(rownames(pca.ind.coord.df),1,3)
+pca.ind.coord.df$Corals <- conditionPop.Corals
+
+for(i in 1:5){
+  for(j in 1:5){
+    if (i != j){
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = pca.ind.coord.df$Corals))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+geom_label_repel()+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Cladocopium C1", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = pca.ind.coord.df$Corals))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Cladocopium C1", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+    }
+  }
+}
+dev.off()
+
+# Figures : PCA TPM Populations Condition - Removed I04
+pdf(file = "PCA-Cladocopium-C1-Pocillopora-TPM-SCALE-Populations-Conditions-Removed-I04-With-Host.pdf", width = 12, height = 12)
+dataAlltrans <- data.frame(t(t(scale(t(tabTPM.C1.matrix2), scale = FALSE))), islands = conditionPop2)
+pca <- PCA(dataAlltrans[,1:(ncol(dataAlltrans)-1)], graph = FALSE, scale.unit = TRUE)
+pca.ind.coord.df <- data.frame(pca$ind$coord)
+pca.ind.coord.df$Pop <- conditionPop2
+pca.ind.coord.df$Islands <- substr(rownames(pca.ind.coord.df),1,3)
+pca.ind.coord.df$Corals <- conditionPop.Corals2
+
+for(i in 1:5){
+  for(j in 1:5){
+    if (i != j){
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = pca.ind.coord.df$Corals))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+geom_label_repel()+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Cladocopium C1", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = pca.ind.coord.df$Corals))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Cladocopium C1", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+    }
+  }
+}
+dev.off()
+```
+
+### 7.2.2. Hclust
+
+```{r}
+disTPM <- vegdist(t(tabTPM.C1))
+dis <- vegdist(t(dataAll.C1))
+
+pdf(file = "Hclust-Cladocopium-C1-CDS-TPM-Raw-Count.pdf", width = 12)
+clus <- hclust(disTPM, "single")
+plot(clus, main = "Single linkage - Cladocopium-C1 - Pocillopora - TPM") 
+
+cluc <- hclust(disTPM, "complete")
+plot(cluc, main = "Complete linkage - Cladocopium-C1 - Pocillopora - TPM")
+
+clua <- hclust(disTPM, "average")
+plot(clua, main = "Average linkage - Cladocopium-C1 - Pocillopora - TPM") 
+
+clus <- hclust(dis, "single")
+plot(clus, main = "Single linkage - Cladocopium-C1 - Pocillopora - Raw Count") 
+
+cluc <- hclust(dis, "complete")
+plot(cluc, main = "Complete linkage - Cladocopium-C1 - Pocillopora - Raw Count")
+
+clua <- hclust(dis, "average")
+plot(clua, main = "Average linkage - Cladocopium-C1 - Pocillopora - Raw Count") 
+
+# TPM
+sere.dendro(tabTPM.C1)
+plot(hclust(dist(t(tabTPM.C1[rowMins(tabTPM.C1) > 0,]))), main = "TPM clustering in Pocillopora  samples - Cladocopium C1 - 99% identity")
+
+# Raw data
+sere.dendro(dataAll.C1)
+plot(hclust(dist(t(dataAll.C1[rowMins(dataAll.C1) > 0,]))), main = "Raw clustering in Pocillopora  samples - Cladocopium C1 - 99% identity")
+dev.off()
+```
+
+## 7.3. Durusdinium - D2
+
+### 7.3.1. PCA
+
+```{r}
+# Figures : PCA TPM Islands Conditions
+pdf(file = "PCA-Durusdinium-D2-Pocillopora-TPM-SCALE-Islands-Conditions-With-Host.pdf", width = 12, height = 12)
+tabTPM.D2trans <- data.frame(t(t(scale(t(tabTPM.D2.matrix), scale = TRUE))), islands = conditionIsl)
+pca <- PCA(tabTPM.D2trans[,1:(ncol(tabTPM.D2trans)-1)], graph = FALSE, scale.unit = TRUE)
+pca.ind.coord.df <- data.frame(pca$ind$coord)
+pca.ind.coord.df$Pop <- conditionPop
+pca.ind.coord.df$Islands <- substr(rownames(pca.ind.coord.df),1,3)
+pca.ind.coord.df$Corals <- conditionPop.Corals
+
+for(i in 1:5){
+  for(j in 1:5){
+    if (i != j){
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = pca.ind.coord.df$Corals))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+geom_label_repel()+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Durusdinium D2", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = pca.ind.coord.df$Corals))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Durusdinium D2", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+    }
+  }
+}
+dev.off()
+
+# Figures : PCA TPM Islands Condition - Removed I04
+pdf(file = "PCA-Durusdinium-D2-Pocillopora-TPM-SCALE-Islands-Conditions-Removed-I04-With-Host.pdf", width = 12, height = 12)
+tabTPM.D2trans <- data.frame(t(t(scale(t(tabTPM.D2.matrix2), scale = FALSE))), islands = conditionIsl2)
+pca <- PCA(tabTPM.D2trans[,1:(ncol(tabTPM.D2trans)-1)], graph = FALSE, scale.unit = TRUE)
+pca.ind.coord.df <- data.frame(pca$ind$coord)
+pca.ind.coord.df$Pop <- conditionPop2
+pca.ind.coord.df$Islands <- substr(rownames(pca.ind.coord.df),1,3)
+
+for(i in 1:5){
+  for(j in 1:5){
+    if (i != j){
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = rownames(pca.ind.coord.df)))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+geom_label_repel()+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Durusdinium D2", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = rownames(pca.ind.coord.df)))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Durusdinium D2", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+    }
+  }
+}
+dev.off()
+
+
+# Figures : PCA TPM Populations Condition
+pdf(file = "PCA-Durusdinium-D2-Pocillopora-TPM-SCALE-Populations-Conditions-With-Host.pdf", width = 12, height = 12)
+dataAlltrans <- data.frame(t(t(scale(t(tabTPM.D2.matrix), scale = TRUE))), islands = conditionPop)
+pca <- PCA(dataAlltrans[,1:(ncol(dataAlltrans)-1)], graph = FALSE, scale.unit = TRUE)
+pca.ind.coord.df <- data.frame(pca$ind$coord)
+pca.ind.coord.df$Pop <- conditionPop
+pca.ind.coord.df$Islands <- substr(rownames(pca.ind.coord.df),1,3)
+pca.ind.coord.df$Corals <- conditionPop.Corals
+
+for(i in 1:5){
+  for(j in 1:5){
+    if (i != j){
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = pca.ind.coord.df$Corals))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+geom_label_repel()+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Durusdinium D2", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = pca.ind.coord.df$Corals))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Durusdinium D2", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+    }
+  }
+}
+dev.off()
+
+# Figures : PCA TPM Populations Condition - Removed I04
+pdf(file = "PCA-Durusdinium-D2-Pocillopora-TPM-SCALE-Populations-Conditions-Removed-I04-With-Host.pdf", width = 12, height = 12)
+dataAlltrans <- data.frame(t(t(scale(t(tabTPM.D2.matrix2), scale = FALSE))), islands = conditionPop2)
+pca <- PCA(dataAlltrans[,1:(ncol(dataAlltrans)-1)], graph = FALSE, scale.unit = TRUE)
+pca.ind.coord.df <- data.frame(pca$ind$coord)
+pca.ind.coord.df$Pop <- conditionPop2
+pca.ind.coord.df$Islands <- substr(rownames(pca.ind.coord.df),1,3)
+pca.ind.coord.df$Corals <- conditionPop.Corals2
+
+for(i in 1:5){
+  for(j in 1:5){
+    if (i != j){
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = pca.ind.coord.df$Corals))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+geom_label_repel()+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Durusdinium D2", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = pca.ind.coord.df$Corals))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Durusdinium D2", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+    }
+  }
+}
+dev.off()
+```
+
+### 7.3.2. Hclust
+
+```{r}
+disTPM <- vegdist(t(tabTPM.D2))
+dis <- vegdist(t(dataAll.D2))
+
+pdf(file = "Hclust-Durusdinium-D2-TPM-Raw-Count.pdf", width = 12)
+clus <- hclust(disTPM, "single")
+plot(clus, main = "Single linkage - Durusdinium-D2 - Pocillopora - TPM") 
+
+cluc <- hclust(disTPM, "complete")
+plot(cluc, main = "Complete linkage - Durusdinium-D2 - Pocillopora - TPM")
+
+clua <- hclust(disTPM, "average")
+plot(clua, main = "Average linkage - Durusdinium-D2 - Pocillopora - TPM") 
+
+clus <- hclust(dis, "single")
+plot(clus, main = "Single linkage - Durusdinium-D2 - Pocillopora - Raw Count") 
+
+cluc <- hclust(dis, "complete")
+plot(cluc, main = "Complete linkage - Durusdinium-D2 - Pocillopora - Raw Count")
+
+clua <- hclust(dis, "average")
+plot(clua, main = "Average linkage - Durusdinium-D2 - Pocillopora - Raw Count") 
+
+# TPM
+sere.dendro(tabTPM.D2)
+plot(hclust(dist(t(tabTPM.D2[rowMins(tabTPM.D2) > 0,]))), main = "TPM clustering in Pocillopora  samples - Durusdinium D2 - 99% identity")
+
+# Raw data
+sere.dendro(dataAll.D2)
+plot(hclust(dist(t(dataAll.D2[rowMins(dataAll.D2) > 0,]))), main = "Raw clustering in Pocillopora  samples - Durusdinium D2 - 99% identity")
+dev.off()
+```
+
+# 8. Pearson correlation
+
+## 8.1. Cladocopium C1
+
+```{r}
+tabCor.C1 <- reshape2::melt(round(cor(dataAll.C1), 3))
+
+pdf(file="Pearson-correlation-Cladocopium-C1.pdf", width = 25, height = 18)
+plot(ggplot(data = tabCor.C1, aes(x=Var1, y=Var2, fill=value))+geom_tile()+theme(strip.text.x = element_text(size = 9, angle = 90), axis.text.x = element_text(angle = 90, size = 12), axis.text.y = element_text(size = 12), legend.text = element_text(size = 10), legend.position = "bottom", legend.title = element_text(size = 10), axis.title.x = element_text(size = 15), axis.title.y = element_text(size = 15))+labs(title = "Pearson coefficient between Tara Pacific samples - MetaT - Pocillopora", y = "Samples", x = "Samples"))
+
+plot(ggplot(data = tabCor.C1, aes(x=Var1, y=Var2, fill=value))+geom_tile()+theme(strip.text.x = element_text(size = 9, angle = 90), axis.text.x = element_text(angle = 90, size = 12), axis.text.y = element_text(size = 12), legend.text = element_text(size = 10), legend.position = "bottom", legend.title = element_text(size = 10), axis.title.x = element_text(size = 15), axis.title.y = element_text(size = 15))+labs(title = "Pearson coefficient between Tara Pacific samples - MetaT - Pocillopora", y = "Samples", x = "Samples")+geom_text(data = tabCor.C1, aes(x = Var1, y = Var2, label = value), color = "white"))
+dev.off()
+```
+
+
+## 8.2. Durusdinium D2
+
+```{r}
+tabCor.D2 <- reshape2::melt(round(cor(dataAll.D2), 3))
+
+pdf(file="Pearson-correlation-Durusdinium-D2.pdf", width = 25, height = 18)
+plot(ggplot(data = tabCor.D2, aes(x=Var1, y=Var2, fill=value))+geom_tile()+theme(strip.text.x = element_text(size = 9, angle = 90), axis.text.x = element_text(angle = 90, size = 12), axis.text.y = element_text(size = 12), legend.text = element_text(size = 10), legend.position = "bottom", legend.title = element_text(size = 10), axis.title.x = element_text(size = 15), axis.title.y = element_text(size = 15))+labs(title = "Pearson coefficient between Tara Pacific samples - MetaT - Pocillopora", y = "Samples", x = "Samples"))
+
+plot(ggplot(data = tabCor.D2, aes(x=Var1, y=Var2, fill=value))+geom_tile()+theme(strip.text.x = element_text(size = 9, angle = 90), axis.text.x = element_text(angle = 90, size = 12), axis.text.y = element_text(size = 12), legend.text = element_text(size = 10), legend.position = "bottom", legend.title = element_text(size = 10), axis.title.x = element_text(size = 15), axis.title.y = element_text(size = 15))+labs(title = "Pearson coefficient between Tara Pacific samples - MetaT - Pocillopora", y = "Samples", x = "Samples")+geom_text(data = tabCor.D2, aes(x = Var1, y = Var2, label = value), color = "white"))
+dev.off()
+```
+
+# 9. PCA by groups
+
+## 9.1. Load Data
+
+```{r}
+colors <- c("#9E0142", "#F46D43", "#FEE08B", "#ABDDA4", "#3288BD", "#5E4FA2", "#C51B7D", "#4D9221", "#8C510A", "#CAB2D6", "#66C2A5", "#5E4FA2")
+conditionIsl <- c(rep("I01", 9), rep("I02", 9), rep("I03", 10), rep("I04", 12), rep("I05", 9), rep("I06", 9), rep("I07", 9), rep("I08", 9), rep("I09", 9), rep("I10", 9), rep("I15", 9))
+
+# Data modifications
+samples.groups <- unique(mapC1[-grep("Not.Assigned", mapC1$Cladocopium), c("Origin")])
+tabTPM.Groups.matrix <- as.matrix(tabTPM.C1[,colnames(tabTPM.C1)%in%samples.groups])
+conditionIsl.Groups <- rep(names(table(substr(colnames(tabTPM.Groups.matrix), 1, 3))), table(substr(colnames(tabTPM.Groups.matrix), 1, 3)))
+test <- data.frame(mapC1[-grep("Not.Assigned", mapC1$Cladocopium), c("Origin")], mapC1[-grep("Not.Assigned", mapC1$Cladocopium), c("Cladocopium")])
+colnames(test) <- c("Origin", "Cladocopium")
+Pop.select.Groups <- unique(test[order(test$Origin, decreasing = FALSE),])
+conditionPop.Groups <- Pop.select.Groups$Cladocopium
+names(conditionPop.Groups) <- Pop.select.Groups$Origin
+test <- data.frame(mapC1[-grep("Not.Assigned", mapC1$Cladocopium), c("Origin")], mapC1[-grep("Not.Assigned", mapC1$Cladocopium), c("Host.Pop")])
+colnames(test) <- c("Origin", "Host.Pop")
+Pop.select.Groups <- unique(test[order(test$Origin, decreasing = FALSE),])
+conditionPop.Corals.Groups <- Pop.select.Groups$Host.Pop
+names(conditionPop.Corals.Groups) <- Pop.select.Groups$Origin
+```
+
+
+
+```{r}
+# Figures : PCA TPM Islands Condition - Removed I04
+pdf(file = "PCA-Cladocopium-C1-Pocillopora-TPM-SCALE-Islands-Conditions-Removed-I04-With-Host.pdf", width = 12, height = 12)
+tabTPM.C1trans <- data.frame(t(t(scale(t(tabTPM.C1.matrix2), scale = FALSE))), islands = conditionIsl2)
+pca <- PCA(tabTPM.C1trans[,1:(ncol(tabTPM.C1trans)-1)], graph = FALSE, scale.unit = TRUE)
+pca.ind.coord.df <- data.frame(pca$ind$coord)
+pca.ind.coord.df$Pop <- conditionPop2
+pca.ind.coord.df$Islands <- substr(rownames(pca.ind.coord.df),1,3)
+
+for(i in 1:5){
+  for(j in 1:5){
+    if (i != j){
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = rownames(pca.ind.coord.df)))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+geom_label_repel()+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Cladocopium C1", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = rownames(pca.ind.coord.df)))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Cladocopium C1", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+    }
+  }
+}
+dev.off()
+
+
+# Figures : PCA TPM Populations Condition
+pdf(file = "PCA-Cladocopium-C1-Pocillopora-TPM-SCALE-Populations-Conditions-With-Host.pdf", width = 12, height = 12)
+dataAlltrans <- data.frame(t(t(scale(t(tabTPM.C1.matrix), scale = TRUE))), islands = conditionPop)
+pca <- PCA(dataAlltrans[,1:(ncol(dataAlltrans)-1)], graph = FALSE, scale.unit = TRUE)
+pca.ind.coord.df <- data.frame(pca$ind$coord)
+pca.ind.coord.df$Pop <- conditionPop
+pca.ind.coord.df$Islands <- substr(rownames(pca.ind.coord.df),1,3)
+pca.ind.coord.df$Corals <- conditionPop.Corals
+
+for(i in 1:5){
+  for(j in 1:5){
+    if (i != j){
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = pca.ind.coord.df$Corals))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+geom_label_repel()+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Cladocopium C1", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = pca.ind.coord.df$Corals))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Cladocopium C1", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+    }
+  }
+}
+dev.off()
+
+# Figures : PCA TPM Populations Condition - Removed I04
+pdf(file = "PCA-Cladocopium-C1-Pocillopora-TPM-SCALE-Populations-Conditions-Removed-I04-With-Host.pdf", width = 12, height = 12)
+dataAlltrans <- data.frame(t(t(scale(t(tabTPM.C1.matrix2), scale = FALSE))), islands = conditionPop2)
+pca <- PCA(dataAlltrans[,1:(ncol(dataAlltrans)-1)], graph = FALSE, scale.unit = TRUE)
+pca.ind.coord.df <- data.frame(pca$ind$coord)
+pca.ind.coord.df$Pop <- conditionPop2
+pca.ind.coord.df$Islands <- substr(rownames(pca.ind.coord.df),1,3)
+pca.ind.coord.df$Corals <- conditionPop.Corals2
+
+for(i in 1:5){
+  for(j in 1:5){
+    if (i != j){
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = pca.ind.coord.df$Corals))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+geom_label_repel()+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Cladocopium C1", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+      plot(ggplot(data = pca.ind.coord.df, aes(x = pca.ind.coord.df[,i], y = pca.ind.coord.df[,j], label = pca.ind.coord.df$Corals))+geom_point(aes(shape = pca.ind.coord.df$Pop, color = pca.ind.coord.df$Islands), size = 5)+scale_color_manual(values = colors)+labs(title = "PCA - Read Counts normalized in TPM - Pocillopora - Cladocopium C1", x = paste("PC",i, " ", round(pca$eig[i,2], digits = 3), " % variance", sep = ""), y = paste("PC",j, " ", round(pca$eig[j,2], digits = 3), " % variance", sep = ""))+theme_minimal())
+    }
+  }
+}
+dev.off()
+```
+
+
+```{r}
+head(mapC1.D2)
+#tab.expr <- aggregate(as.numeric(mapC1.D2$MapCount), by = list(Origin = mapC1.D2$Origin, Transcriptome = mapC1.D2$Transcriptome, Island = mapC1.D2$Island, Cladocopium = mapC1.D2$Cladocopium, Host.Pop = mapC1.D2$Host.Pop), mean)
+
+pdf(file = "Read-Counts-Cladocopium-C1-Durusdinium-D2-Pocillopora.pdf", width = 26, height = 16)
+ggplot(mapC1.D2, aes(x = Origin, y = log2(MapCount), fill = Transcriptome))+geom_boxplot(position=position_dodge(1))+labs(title = "Reads that mapped on Cladocopium C1 CDS and Durusdinium D2", x = "Samples", y = "log2(Read counts)")+facet_grid(.~Island, scales = "free_x", space = "free_x")+theme(strip.text.x = element_text(size = 10), axis.text.x = element_text(size = 9, angle = 90), axis.text.y = element_text(size = 7), legend.position = "bottom")
+
+ggplot(mapC1.D2[grep("Cladocopium-goreaui-C1-CDS", mapC1.D2$Transcriptome),], aes(x = Origin, y = log2(MapCount), fill = Cladocopium))+geom_boxplot(position=position_dodge(1))+labs(title = "Reads that mapped on Cladocopium C1 CDS", x = "Samples", y = "log2(Read counts)")+facet_grid(.~Island, scales = "free_x", space = "free_x")+theme(strip.text.x = element_text(size = 10), axis.text.x = element_text(size = 9, angle = 90), axis.text.y = element_text(size = 7), legend.position = "bottom")
+
+ggplot(mapC1.D2[grep("Durusdinium-D2-Ahyac", mapC1.D2$Transcriptome),], aes(x = Origin, y = log2(MapCount), fill = Cladocopium))+geom_boxplot(position=position_dodge(1))+labs(title = "Reads that mapped on Durusdinium D2", x = "Samples", y = "log2(Read counts)")+facet_grid(.~Island, scales = "free_x", space = "free_x")+theme(strip.text.x = element_text(size = 10), axis.text.x = element_text(size = 9, angle = 90), axis.text.y = element_text(size = 7), legend.position = "bottom")
+dev.off()
+
+mapC1.Bis <- mapC1[-grep("Not.Assigned", mapC1$Cladocopium),]
+dataAll.C1 <- acast(mapC1.Bis, QuerySeqID~Origin, fill=0, value.var="MapCount")
+tabCor.C1.Bis <- reshape2::melt(round(cor(dataAll.C1), 3))
+
+pdf(file="Pearson-correlation-C1-Bis.pdf", width = 25, height = 18)
+plot(ggplot(data = tabCor.C1.Bis, aes(x=Var1, y=Var2, fill=value))+geom_tile()+theme(strip.text.x = element_text(size = 9, angle = 90), axis.text.x = element_text(angle = 90, size = 12), axis.text.y = element_text(size = 12), legend.text = element_text(size = 10), legend.position = "bottom", legend.title = element_text(size = 10), axis.title.x = element_text(size = 15), axis.title.y = element_text(size = 15))+labs(title = "Pearson coefficient between Tara Pacific samples - MetaT - Pocillopora", y = "Samples", x = "Samples"))
+
+plot(ggplot(data = tabCor.C1.Bis, aes(x=Var1, y=Var2, fill=value))+geom_tile()+theme(strip.text.x = element_text(size = 9, angle = 90), axis.text.x = element_text(angle = 90, size = 12), axis.text.y = element_text(size = 12), legend.text = element_text(size = 10), legend.position = "bottom", legend.title = element_text(size = 10), axis.title.x = element_text(size = 15), axis.title.y = element_text(size = 15))+labs(title = "Pearson coefficient between Tara Pacific samples - MetaT - Pocillopora", y = "Samples", x = "Samples")+geom_text(data = tabCor.C1.Bis, aes(x = Var1, y = Var2, label = value), color = "white"))
+dev.off()
+```
