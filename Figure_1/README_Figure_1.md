@@ -112,6 +112,13 @@ ggdendITS2 <- as.ggdend(dendITS2)
 ggplot(ggdendITS2, horiz = TRUE, theme=NULL) + 
   theme(axis.line.y=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank(),axis.line.x=element_line(color="black"),panel.background = element_blank())+
   labs(y="",x="ITS2 dendrogram")
+ 
+#Write dendrogram in newick/nexus format
+library(ctc)
+write(file="Cladocopium_ITS2.dendrogram.newick",hc2Newick(dendITS,flat=T))
+library(ape)
+write.nexus(as.phylo(dendITS), file="Cladocopium_ITS2.dendrogram.nex")
+
 ```
 
 ## 2. Identification of _Cladocopium_ lineages with SNPs called on transcriptomic reads.  
