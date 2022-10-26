@@ -47,23 +47,8 @@ library("hgu95av2.db")
 ## 1.2. Load DEG - Data 
 
 ```{r}
-#DEG.G2 <- read.table("DEG-Cladocopium-C1-Pocillopora-DEG-Islands-Comparisons-G2.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
-#DEG.G2 <- DEG.G2[-grep("I07", DEG.G2$Condition),]
-#DEG.G2$Comparisons <- rep("SVD1-Group2-I05-vs-I06", nrow(DEG.G2))
-
-#DEG.G3 <- read.table("DEG-Cladocopium-C1-Pocillopora-DEG-Islands-Comparisons-G3.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
-#DEG.G3 <- DEG.G3[-grep("I10", DEG.G3$Condition),]
-#DEG.G3$Comparisons <- rep("SVD3-SVD5-Group3-I05-vs-I07-vs-I08-vs-I09-vs-I15", nrow(DEG.G3))
-#colnames(DEG.G3) <- colnames(DEG.G2)
-
-#DEG.G4 <- read.table("DEG-Cladocopium-C1-Pocillopora-DEG-Islands-Comparisons-G4.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
-#DEG.G4$Comparisons <- rep("SVD4-Group4-I05-vs-I06", nrow(DEG.G4))
-#colnames(DEG.G4) <- colnames(DEG.G2)
-
 DEG <- read.table("DEG-Cladocopium-C1-Pocillopora-Groups-Comparisons.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 DEG$Comparisons <- rep("Cladocopium-Groups", nrow(DEG))
-#DEG.G5 <- DEG.G5[-grep("I07", DEG.G5$Condition),]
-#colnames(DEG.G5) <- colnames(DEG.G2)
 
 DEG.Specific.Analyses <- DEG
 colnames(DEG.Specific.Analyses) <- c("Genes", "baseMean", "log2FoldChange", "lfcSE", "pvalue","padj", "Condition", "Comparisons")
