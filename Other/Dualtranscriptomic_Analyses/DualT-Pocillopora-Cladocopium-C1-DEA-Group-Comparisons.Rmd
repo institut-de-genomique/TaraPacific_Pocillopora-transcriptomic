@@ -2,6 +2,7 @@
 title: Pocillopora Samples differential expression analyses - Cladocopium C1 reference
   CDS - 19.11.2020
 author: "Julie Lê-Hoang"
+contact : lehoang.julie@hotmail.fr
 output: pdf_document
 ---
 
@@ -10,66 +11,30 @@ output: pdf_document
 ## 1.1. Load Packages
 
 ```{r}
-#install.packages("ggplot2")
 library("ggplot2")
-#install.packages("stringr", dependencies = TRUE)
 library("stringr")
-#install.packages("RColorBrewer")
 library("RColorBrewer")
-#install.packages("dplyr")
 library("dplyr")
-#install.packages("reshape2")
 library("reshape2")
-#install.packages("ggrepel")
 library("ggrepel")
-#install.packages("FactoMineR")
 library("FactoMineR")
-#install.packages("pheatmap")
 library("pheatmap")
 library("htmlwidgets")
 library("stringi")
-
-## try http:// if https:// URLs are not supported
-#if (!requireNamespace("BiocManager", quietly = TRUE))
-#    install.packages("BiocManager")
-
-#BiocManager::install("DESeq2")
 library("DESeq2")
-#BiocManager::install("ashr")
 library("ashr")
-#BiocManager::install("apeglm")
 library("apeglm")
-#biocLite("edgeR")
-#library("edgeR")
-#biocLite("limma")
 library("limma")
-#install.packages("gplots")
 library("gplots")
-
-#install.packages("venneuler")
 library("venneuler")
-
-#install.packages("VennDiagram")
 library("VennDiagram")
-
-#install.packages("eulerr")
 library("eulerr")
-#install.packages("factoextra")
 library("factoextra")
-#install.packages("treemap")
 library("httpuv")
 library("treemap")
-#install.packages("GOplot")
 library("GOplot")
-
-#install.packages("vegan")
 library("vegan")
-
-#install.packages("xlsx") 
-#library("xlsx")
-#install.packages("seqinr") 
 library("seqinr")
-#install.packages("openxlsx", dependencies = TRUE)
 library(openxlsx)
 library(data.table)
 ```
