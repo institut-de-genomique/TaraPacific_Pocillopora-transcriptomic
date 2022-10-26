@@ -1,6 +1,7 @@
 ---
 title: "Cladocopium C1 CDS - 19.11.2020"
 author: "Julie Lê-Hoang"
+contact: lehoang.julie@hotmail.fr
 ---
 
 # 1. Load data and packages
@@ -8,25 +9,15 @@ author: "Julie Lê-Hoang"
 ## 1.1. Load Packages
 
 ```{r}
-#install.packages("ggplot2")
 library("ggplot2")
-#install.packages("stringr", dependencies = TRUE)
 library("stringr")
-#install.packages("RColorBrewer")
 library("RColorBrewer")
-#install.packages("dplyr")
 library("dplyr")
-#install.packages("reshape2")
 library("reshape2")
-#install.packages("ggrepel")
 library("ggrepel")
-#install.packages("FactoMineR")
 library("FactoMineR")
-#install.packages("matrixStats")
 library("matrixStats")
-#install.packages("factoextra")
 library("factoextra")
-#install.packages("data.table")
 library("data.table")
 library("vegan")
 ```
