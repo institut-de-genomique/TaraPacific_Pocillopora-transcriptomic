@@ -3,8 +3,9 @@
 We used the following pipeline to obtain read count of _Cladocopium_ and _Durusdinium_ in dual-transcriptomic samples. 
 
 ## 1. Indexation of the reference transcriptomes
+```bash
 bwa index Cladocopium-goreaui-C1-CDS-and-Durusdinium-D2-Ahyac-Transcriptome-with-taxonomic-affiliation-Tara-DB-Switch-Filter-90.fasta
-
+```
 ## 2. Formated sample file as :
 Sample_ID Path_Read1  Path_Read2
 
