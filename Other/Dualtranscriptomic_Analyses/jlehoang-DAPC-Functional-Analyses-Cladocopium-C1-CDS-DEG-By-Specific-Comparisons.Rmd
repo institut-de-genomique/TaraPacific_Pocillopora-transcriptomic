@@ -1,6 +1,7 @@
 ---
 title: "Cladocopium C1 DEG - DualT - Functional Analyses - 18.11.2020"
 author: "Julie Lê-Hoang"
+contact : "lehoang.julie@hotmail.fr"
 ---
 
 # 1. Load data and packages
@@ -296,4 +297,5 @@ write.table(Pfam.SVD2SymGG5.Genes, file = "Genes-Associated-PFAM-SVD2SymGG5-All-
 Pfam.SVD3SymGG3.Genes <- Genes.Association(WGCNA = Func.SVD3SymGG3, PFAM = Pfam.Enrichment.SVD3SymGG3, pval = 0.01, Annot = mapC1, Cladocopium = "G3", SVD = "SVD3")
 write.table(Pfam.SVD3SymGG3.Genes, file = "Genes-Associated-PFAM-SVD3SymGG3-All-Modules-WGCNA.txt", quote = FALSE, sep = "\t", row.names = FALSE)
 ```
+
 
