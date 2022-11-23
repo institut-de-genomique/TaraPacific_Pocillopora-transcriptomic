@@ -6,8 +6,8 @@ ITS2 sequences are available under the PRJEB52458 project and were obtained foll
 ITS2 sequences were processed with the Symportal pipeline and the results are available here : https://doi.org/10.5281/zenodo.4061796  
 ITS2 profil abundances in each colony is in : TARA_PACIFIC_METAB_ITS2_coral_its2_type_profiles_absolute_abund_and_meta_v1.csv  
 
-### A. Barplot of ITS2 profiles (Supplementary Figure X) 
-The R code to produce Supplementary Figure 4 is below  
+### A. Barplot of ITS2 profiles
+The R code to produce Supplementary Fig. 2 is below  
 
 ```r
 #Required library
@@ -57,6 +57,7 @@ set<-c("#3a867c","#3a9a7c",
        "#4e9af5",
        "#E41A1C","#ee1a1c","#f81a1c","#ff1a1c")
 
+#Supplementary Fig. 2
 ggplot(tab3,aes(x=SiteColo,y=Value,fill=Type))+
   geom_bar(stat="identity",position="fill")+
   scale_fill_manual(values=set)+
@@ -64,7 +65,7 @@ ggplot(tab3,aes(x=SiteColo,y=Value,fill=Type))+
   guides(fill=guide_legend(ncol=1))
 ```
 
-### B. Hierarchical clustering of ITS2 profile Bray Curtis distances (Figure 1B)
+### B. Hierarchical clustering of ITS2 profile Bray Curtis distances (Supplementary Fig. 3b)
 ITS2 sequences were processed with the Symportal pipeline and the results are available here : https://doi.org/10.5281/zenodo.4061796  
 ITS2 profil Braycurtis distances is available on Zenodo (https://doi.org/10.5281/zenodo.4061796) : TARA_PACIFIC_METAB_ITS2_coral_between_sample_distances_C_braycurtis_distances_sqrt_v1.dist
 
@@ -109,6 +110,8 @@ dendITS2 <- as.dendrogram(dendITS) %>%
 
 #Conversion into ggplot tree
 ggdendITS2 <- as.ggdend(dendITS2)
+
+#Supplementary Fig. 3b
 ggplot(ggdendITS2, horiz = TRUE, theme=NULL) + 
   theme(axis.line.y=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank(),axis.line.x=element_line(color="black"),panel.background = element_blank())+
   labs(y="",x="ITS2 dendrogram")
@@ -124,7 +127,7 @@ write.nexus(as.phylo(dendITS), file="Cladocopium_ITS2.dendrogram.nex")
 ## 2. Identification of _Cladocopium_ lineages with SNPs called on transcriptomic reads.  
 ### A. SNP calling
 
-### B. Hierarchical clustering of SNP frequencies (Figure 1A)
+### B. Hierarchical clustering of SNP frequencies (Supplementary Fig. 3a)
 
 ```r
 library(dendextend)
@@ -167,7 +170,7 @@ dendSNP2 <- as.dendrogram(dendSNP) %>%
 #Conversion in ggplot format
 ggdendSNP2 <- as.ggdend(dendSNP2)
 
-#Figure 1A
+#Supplementary Fig. 3a
 ggplot(ggdendSNP2, horiz = TRUE, theme=NULL) + 
   theme(axis.line.y=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank(),axis.line.x=element_line(color="black"),panel.background = element_blank())+
   labs(y="",x="SNPs dendrogram")
@@ -178,13 +181,13 @@ dendITS4 <-rotate(dendITS2,Variable[order(Variable$SymbioGG),"Samples"][Variable
 dendSNP4 <-rotate(dendSNP2,Variable[order(Variable$SymbioGG),"Samples"][Variable[order(Variable$SymbioGG),"Samples"]%in%labels(dendSNP2)])
   
 dendCombined<-dendlist(dendITS4, dendSNP4)
-#Figure 1A and 1B
+#Supplementary Fig. 3a and b
 dend_diff(dendCombined)
 ```
 
-## 3. Analysis of psbA<sup>ncr</sup> sequences in _Pocillopora_ samples
+## 3. Analysis of psbA<sup>ncr</sup> sequences in _Pocillopora_ samples  (Supplementary Fig. 3c)
 
-We analyzed the non-coding region of the psbA gene (psbA<sup>ncr</sup>) to assign _Cladocopium_ lineages to known _Cladocopium_ species following the method used in Johnston et al 2022 (https://pubmed.ncbi.nlm.nih.gov/35960256/) and Turnham et al 2021 (https://www.nature.com/articles/s41396-021-01007-8). The code below describes : (A) The mapping of metagenomic reads of the 82 _Pocillopora_ corals containing Cladocopium symbionts on 3 psbAncr sequences (C. latusorum MW819767.1, C. pacificum MW861717, and C. goreaui KF572161.1) the build of consensus sequences for each sample. (B) The alignement then construction of Bayesian phylogeny using 2 psbA<sup>ncr</sup> sequences for each Cladocopium clade identified in Johnston et al 2022 and and the 82 consensus sequences. (C) The representation of the phylogeny with R.
+We analyzed the non-coding region of the psbA gene (psbA<sup>ncr</sup>) to assign _Cladocopium_ lineages to known _Cladocopium_ species following the method used in Johnston et al 2022 (https://pubmed.ncbi.nlm.nih.gov/35960256/) and Turnham et al 2021 (https://www.nature.com/articles/s41396-021-01007-8). The code below describes : (A) The mapping of metagenomic reads of the 82 _Pocillopora_ corals containing Cladocopium symbionts on 3 psbAncr sequences (C. latusorum MW819767.1, C. pacificum MW861717, and C. goreaui KF572161.1) the build of consensus sequences for each sample. (B) The alignement then construction of Bayesian phylogeny using 2 psbA<sup>ncr</sup> sequences for each Cladocopium clade identified in Johnston et al 2022 and and the 82 consensus sequences. (C) The representation of the phylogeny with R (Supplementary Fig. 3c).
 
 ### A. Identification of psbA<sup>ncr</sup> sequences in each _Pocillopora_ colonies  
 
@@ -238,7 +241,7 @@ end;
 ./mb -i MrbayesCommands.nex
 ```
 
-### C. Tree representation on R (Figure 1C)
+### C. Tree representation on R (Supplementary Fig. 3)
 
 ```r
 library(ape)
@@ -255,6 +258,7 @@ clade<-clade[!(clade$SymbioGG%in%c("CD","D")),]
 #To color leaves according to _Cladocopium_ lineages
 Tree2 <- groupOTU(Tree$con_50_majrule, split(clade$Sample,clade$SymbioGG))
 
+#Supplementary Fig. 3c
 ggtree(Tree2,size=0.5,aes(x,y)) + 
   geom_treescale()+
   geom_tiplab(size=2,aes(color=group))+
