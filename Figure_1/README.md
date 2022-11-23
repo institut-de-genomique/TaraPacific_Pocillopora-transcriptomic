@@ -142,6 +142,16 @@ tab2<-tab[,colnames(tab)%in%Variable[Variable$Symbio_Genus=="C","Samples"]]
 #Hierarchical clustering
 dendSNP<-hclust(dist(t(tab2)),method = "complete")
 
+#Optimal number of cluster
+library(factoextra)
+OptimalKGapSNP<-fviz_nbclust(tab2, hcut, method = "gap_stat",k.max=12,nboot=50)
+ggplot(OptimalKGapSNP$data,aes(x=clusters,y=gap,group = 1))+
+  geom_point(size=2,alpha=0.5)+
+  geom_line()+
+  geom_errorbar(aes(ymin=ymin,ymax=ymax),width=0.2)+
+  geom_vline(xintercept = 5,linetype=2,color="red")+
+  theme_bw()
+
 #Write dendrogram in newick/nexus format
 library(ctc)
 library(ape)
@@ -151,14 +161,14 @@ write.nexus(as.phylo(dendSNP), file="Cladocopium_SNP.dendrogram.nex")
 #Calculation of the optimal number of cluster
 library(factoextra)
 OptimalKGapSNP<-fviz_nbclust(tab2, hcut, method = "gap_stat",k.max=12,nboot=50) +
-  geom_vline(xintercept = 4, linetype = 2)+
-  labs(subtitle = "gap_stat method")
+pdf(file="Optimal-k_gapstat_boot50.pdf")
 ggplot(OptimalKGapSNP$data,aes(x=clusters,y=gap,group = 1))+
   geom_point(size=2,alpha=0.5)+
   geom_line()+
   geom_errorbar(aes(ymin=ymin,ymax=ymax),width=0.2)+
   geom_vline(xintercept = 5,linetype=2,color="red")+
   theme_bw()
+dev.off()
 
 #Addition of tree features
 dendSNP2 <- as.dendrogram(dendSNP) %>%
