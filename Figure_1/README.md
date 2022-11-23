@@ -241,7 +241,7 @@ end;
 ./mb -i MrbayesCommands.nex
 ```
 
-### C. Tree representation on R (Supplementary Fig. 3)
+### C. Tree representation on R (Supplementary Fig. 3c)
 
 ```r
 library(ape)
