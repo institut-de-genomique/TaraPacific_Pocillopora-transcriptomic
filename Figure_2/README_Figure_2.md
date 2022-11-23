@@ -1,9 +1,10 @@
 
 # Tanglegram and PACo analysis 
-This file contains the code to produce a tanglgram between the host and the symbiont (Figure 2a) and the code for the Procrustean Approach to Cophylogeny (PACo)  analysis (Figure 2b)
+This file contains the code to produce a tanglgram between the host and the symbiont (Figure 2a) and the code for the Procrustean Approach to Cophylogeny (PACo)  analysis (Figure 2b)  
 
 1. Tanglegram (Figure 2a)
 
+```r
 library(dendextend)
 library(DECIPHER)
 library(ape)
@@ -49,5 +50,6 @@ dendCombined2<-dendCombined %>%
              lwd = 1.5,
              sort = F)
 dev.off()
+```
 
 2. PACo analysis  (Figure 2b)
