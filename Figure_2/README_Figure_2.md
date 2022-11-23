@@ -25,7 +25,7 @@ PocTree3 <- as.dendrogram(PocTree2) %>%
   set("labels_col",c("#fb9a99", "#a6cee3" ,"#b2df8a", "#1f78b4","#33a02c")[as.factor(unlist(lapply(labels(PocTree2),function(x){Variable[Variable$Samples==x,"PocilloGG"]})))])
 
 
-CladoTree<-ReadDendrogram(file = "Cladocopium_SNP.dendrogram.nex,internalLabels = F,keepRoot = T)
+CladoTree<-ReadDendrogram(file = "Cladocopium_SNP.dendrogram.nwk,internalLabels = F,keepRoot = T)
 
 CladoTree2 <- as.dendrogram(CladoTree) %>%
   set("labels_cex", c(.5)) %>%
