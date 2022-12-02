@@ -10,13 +10,12 @@ GetOptions(
 );
 
 
-#Ouverture de 2 fichiers pour écrire les résultats
+#4 files
 open (FREQ, ">$out.freq.tab");
 open (COV, ">$out.cov.tab");
 open (COMB, ">$out.combined.tab");
 open (VCF, ">$out.vcf");
 
-#Lecture du fichier $in nommé IN
 if($in=~/.*\.gz$/){
 	open(IN,"gunzip -c $in|") or die "$in not found";
 }
@@ -26,11 +25,8 @@ else {
 
 my @samples;
 while (<IN>){	
-	#supprime le dernier caractère de chaque ligne (\n)
 	chomp;	
-	#construit un tableau @cols avec comme séaparateur la tabulation pour chaque ligne du fichier
 	my @cols=split("\t",$_);
-	#Enregistrement des noms des échantillons dans la variable $header
 	if ($cols[0] =~ /^#/){
 		print VCF "$_\n";
 		if ($cols[0] eq "#CHROM"){
@@ -46,9 +42,9 @@ while (<IN>){
 			print COMB "CHROM\tPOS\tSAMPLE\tCOV\tFREQ\n";
 		}
 	}
-	#Traitement des SNPs biallelic
+	#For each biallelic SNP
 	elsif ($cols[0]!~/^#/ and length($cols[3])==1 and length($cols[4])==1){
-		#tableau pour noter l'ordre des GT AD PL DP
+		#order of GT AD PL DP...
 		my @list=split(":",$cols[8]);
 		my $i=0;
 		my $DP="NA";
@@ -59,15 +55,13 @@ while (<IN>){
 			$i++;		
 		}
 		if($AD eq "NA"){die "SNP info not found"}
-
-		#Création d'un tableau pour enregistrer les valeurs de fréquence et et différentes infos
 		my @frequences;
 		my @coverages;
 		my $NbSampleOver4reads=0;
 		my $NbSampleWithAltAllele=0;
 		my $NbSampleNA=0;
 
-		#Boucle pour chaque sample
+		#For each sample in the vcf file
 		foreach(my $i=9;$i<=$#cols;$i++){	
 			my $sample=$samples[$i-9];		
 			my @SNPInfo=split(":",$cols[$i]);
@@ -92,8 +86,8 @@ while (<IN>){
 				}	
 			}
 		}
-		#Ecriture des résultats
-		if ($NbSampleOver4reads/($NbSampleOver4reads+$NbSampleNA+$NbSampleWithAltAllele)>=0.75){
+		#Print results in FREQ and COV files
+		if ($NbSampleOver4reads/($NbSampleOver4reads+$NbSampleNA+$NbSampleWithAltAllele)>=0.9){
 			print VCF "$_\n";
 		}
 		print FREQ "$cols[0]\t$cols[1]\t$cols[2]\t$cols[3]\t$cols[4]\t$cols[5]\t$NbSampleOver4reads\t$NbSampleWithAltAllele\t$NbSampleNA\t".join("\t",@frequences)."\n";
