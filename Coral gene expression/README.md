@@ -1,5 +1,6 @@
 # RNAseq reads mapping
-This file contains the tools and commands needed to calculate the number of RNAseq reads aligned on each gene of the *Pocillopora* coral and its *Cladocopium* symbiont.  
+This directory contains the tools needed to calculate the number of RNAseq reads aligned on each gene of the *Pocillopora* coral and its *Cladocopium* symbiont. 
+The command lines are below  
 
 RNAseq reads from 102 *Pocillopora coral colonies* are available at the ebi under the project number : PRJEB52301
 
