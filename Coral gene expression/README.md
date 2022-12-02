@@ -6,7 +6,7 @@ RNAseq reads from 102 *Pocillopora* coral colonies are available at the ebi unde
 
 The complete table of gene expression for *Pocillopora* and *Cladocopium* are available at https://doi.org/10.5281/zenodo.6341761  
 
-## 1. *Cladocopium* goreaui *Durusdinium*
+## 1. *Cladocopium* and *Durusdinium*
 
 The *Cladocopium* genome is available at http://symbs.reefgenomics.org/download/ (https://doi.org/10.1038/s42003-018-0098-3)  
 The *Durusdinium* transcriptome is available at  https://doi.org/10.1186/1471-2148-12-217  
