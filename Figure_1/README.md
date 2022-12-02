@@ -5,13 +5,13 @@ We used three independant methods to identify _Cladocopium_ lineages.
 1. [Identification of _Cladocopium_ lineages with ITS2 sequences](#ITS2)  
        A. [Barplot of ITS2 profiles](#ITS2-A)  
        B. [Hierarchical clustering of ITS2 profile Bray Curtis distances (Supplementary Fig. 3b)](#ITS2-B)  
-2. [Identification of _Cladocopium_ lineages with SNPs called on transcriptomic reads](#SNP) 
-       A. [SNP calling](#SNP-A) 
-       B. [Hierarchical clustering of SNP frequencies (Supplementary Fig. 3a)](#SNP-B) 
-3. [Analysis of psbA<sup>ncr</sup> sequences in _Pocillopora_ samples  (Supplementary Fig. 3c)](#PSBA)
-       A. [Identification of psbA<sup>ncr</sup> sequences in each _Pocillopora_ colonies](#PSBA-A)
-       B. [Multiple alignement and Bayesian phylogeny of psbA<sup>ncr</sup> sequences](#PSBA-B)
-       C. [Tree representation on R (Supplementary Fig. 3c)](#PSBA-C)
+2. [Identification of _Cladocopium_ lineages with SNPs called on transcriptomic reads](#SNP)  
+       A. [SNP calling](#SNP-A)  
+       B. [Hierarchical clustering of SNP frequencies (Supplementary Fig. 3a)](#SNP-B)  
+3. [Analysis of psbA<sup>ncr</sup> sequences in _Pocillopora_ samples  (Supplementary Fig. 3c)](#PSBA)  
+       A. [Identification of psbA<sup>ncr</sup> sequences in each _Pocillopora_ colonies](#PSBA-A)  
+       B. [Multiple alignement and Bayesian phylogeny of psbA<sup>ncr</sup> sequences](#PSBA-B)  
+       C. [Tree representation on R (Supplementary Fig. 3c)](#PSBA-C)  
 
 ## 1. Identification of _Cladocopium_ lineages with ITS2 sequences. <a name="ITS2"></a>
 ITS2 sequences are available under the PRJEB52458 project and were obtained following the procedure detailed here : https://arxiv.org/abs/2207.02475  
@@ -136,10 +136,10 @@ write.nexus(as.phylo(dendITS), file="Cladocopium_ITS2.dendrogram.nex")
 
 ```
 
-## 2. Identification of _Cladocopium_ lineages with SNPs called on transcriptomic reads.  
-### A. SNP calling
+## 2. Identification of _Cladocopium_ lineages with SNPs called on transcriptomic reads.  <a name="SNP"></a>
+### A. SNP calling <a name="SNP-A"></a>
 
-### B. Hierarchical clustering of SNP frequencies (Supplementary Fig. 3a)
+### B. Hierarchical clustering of SNP frequencies (Supplementary Fig. 3a) <a name="SNP-B"></a>
 
 ```r
 library(dendextend)
@@ -207,11 +207,11 @@ dendCombined<-dendlist(dendITS4, dendSNP4)
 dend_diff(dendCombined)
 ```
 
-## 3. Analysis of psbA<sup>ncr</sup> sequences in _Pocillopora_ samples  (Supplementary Fig. 3c)
+## 3. Analysis of psbA<sup>ncr</sup> sequences in _Pocillopora_ samples  (Supplementary Fig. 3c) <a name="PSBA"></a>
 
 We analyzed the non-coding region of the psbA gene (psbA<sup>ncr</sup>) to assign _Cladocopium_ lineages to known _Cladocopium_ species following the method used in Johnston et al 2022 (https://pubmed.ncbi.nlm.nih.gov/35960256/) and Turnham et al 2021 (https://www.nature.com/articles/s41396-021-01007-8). The code below describes : (A) The mapping of metagenomic reads of the 82 _Pocillopora_ corals containing Cladocopium symbionts on 3 psbAncr sequences (C. latusorum MW819767.1, C. pacificum MW861717, and C. goreaui KF572161.1) the build of consensus sequences for each sample. (B) The alignement then construction of Bayesian phylogeny using 2 psbA<sup>ncr</sup> sequences for each Cladocopium clade identified in Johnston et al 2022 and and the 82 consensus sequences. (C) The representation of the phylogeny with R (Supplementary Fig. 3c).
 
-### A. Identification of psbA<sup>ncr</sup> sequences in each _Pocillopora_ colonies  
+### A. Identification of psbA<sup>ncr</sup> sequences in each _Pocillopora_ colonies  <a name="PSBA-A"></a>
 
 Alignement of meatgenomic reads from 82 _Pocillopra_ samples on 3 psbA<sup>ncr</sup> sequences 
 Metagenomic fastq files are available at the ENA under project PRJEB47249  
@@ -241,7 +241,7 @@ cat Bilan_mapping_Cladocopium100-90.tab | while read a b c ;do samtools mpileup 
 for i in *PsBA.aln.filtered100-90.sort.mpileup ;do perl /env/cns/proj/TaraPacifique/bin/Quentin/MpileuptoConsensus.pl -mpileup $i -Mincov 4 -out ${i}.consensus.fa;done
 for i in *_PsBA.aln.filtered100-90.sort.mpileup.consensus.fa;do echo -e ">${i%_*}"; tail -n +2 $i ;done > All_psbA-Cladocopium100-90.aln.mpileup.consensus.fa
 ```
-### B. Multiple alignement and Bayesian phylogeny of psbA<sup>ncr</sup> sequences
+### B. Multiple alignement and Bayesian phylogeny of psbA<sup>ncr</sup> sequences <a name="PSBA-B"></a>
 
 The multiple alignement is done with MegaX software (https://www.megasoftware.net/) using ClustalW method.  
 The result is a nexus alignment file All_psbA.aln.mpileup.consensus_woN_AllJohnston2022_muscle.nexus.
@@ -263,7 +263,7 @@ end;
 ./mb -i MrbayesCommands.nex
 ```
 
-### C. Tree representation on R (Supplementary Fig. 3c)
+### C. Tree representation on R (Supplementary Fig. 3c) <a name="PSBA-C"></a>
 
 ```r
 library(ape)
