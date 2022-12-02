@@ -1,13 +1,24 @@
 # Identification of _Cladocopium_ lineages 
 We used three independant methods to identify _Cladocopium_ lineages.
 
+# Table of contents
+1. [Identification of _Cladocopium_ lineages with ITS2 sequences](#ITS2)
+       A. Barplot of ITS2 profiles(#ITS2-A)
+       B. Hierarchical clustering of ITS2 profile Bray Curtis distances (Supplementary Fig. 3b)(#ITS2-B)
+2. [Identification of _Cladocopium_ lineages with SNPs called on transcriptomic reads](#SNP) 
+       A. SNP calling(#SNP) 
+       B. Hierarchical clustering of SNP frequencies (Supplementary Fig. 3a)(#SNP) 
+3. [Analysis of psbA<sup>ncr</sup> sequences in _Pocillopora_ samples  (Supplementary Fig. 3c)](#PSBA)
+       A. Identification of psbA<sup>ncr</sup> sequences in each _Pocillopora_ colonies(#PSBA)
+       B. Multiple alignement and Bayesian phylogeny of psbA<sup>ncr</sup> sequences(#PSBA)
+       C. Tree representation on R (Supplementary Fig. 3c)(#PSBA)
 
-## 1. Identification of _Cladocopium_ lineages with ITS2 sequences.
+## 1. Identification of _Cladocopium_ lineages with ITS2 sequences. <a name="ITS2"></a>
 ITS2 sequences are available under the PRJEB52458 project and were obtained following the procedure detailed here : https://arxiv.org/abs/2207.02475  
 ITS2 sequences were processed with the Symportal pipeline and the results are available here : https://doi.org/10.5281/zenodo.4061796  
 ITS2 profil abundances in each colony is in : TARA_PACIFIC_METAB_ITS2_coral_its2_type_profiles_absolute_abund_and_meta_v1.csv  
 
-### A. Barplot of ITS2 profiles
+### A. Barplot of ITS2 profiles. <a name="ITS2-A"></a>
 The R code to produce Supplementary Fig. 2 is below  
 
 ```r
@@ -66,7 +77,7 @@ ggplot(tab3,aes(x=SiteColo,y=Value,fill=Type))+
   guides(fill=guide_legend(ncol=1))
 ```
 
-### B. Hierarchical clustering of ITS2 profile Bray Curtis distances (Supplementary Fig. 3b)
+### B. Hierarchical clustering of ITS2 profile Bray Curtis distances (Supplementary Fig. 3b) <a name="ITS2-B"></a>
 ITS2 sequences were processed with the Symportal pipeline and the results are available here : https://doi.org/10.5281/zenodo.4061796  
 ITS2 profil Braycurtis distances is available on Zenodo (https://doi.org/10.5281/zenodo.4061796) : TARA_PACIFIC_METAB_ITS2_coral_between_sample_distances_C_braycurtis_distances_sqrt_v1.dist
 
