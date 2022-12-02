@@ -2,15 +2,15 @@
 We used three independant methods to identify _Cladocopium_ lineages.
 
 # Table of contents
-1. [Identification of _Cladocopium_ lineages with ITS2 sequences](#ITS2)  
+1. [**Identification of _Cladocopium_ lineages with ITS2 sequences**](#ITS2)  
        A. [Barplot of ITS2 profiles (Supplementary Fig. 2)](#ITS2-A)  
        B. [Hierarchical clustering of ITS2 profile Bray Curtis distances (Supplementary Fig. 3b)](#ITS2-B)  
        
-2. [Identification of _Cladocopium_ lineages with SNPs called on transcriptomic reads](#SNP)  
+2. [**Identification of _Cladocopium_ lineages with SNPs called on transcriptomic reads**](#SNP)  
        A. [SNP calling](#SNP-A)  
        B. [Hierarchical clustering of SNP frequencies (Supplementary Fig. 3a)](#SNP-B)  
        
-3. [Analysis of psbA<sup>ncr</sup> sequences in _Pocillopora_ samples  (Supplementary Fig. 3c)](#PSBA)  
+3. [**Analysis of psbA<sup>ncr</sup> sequences in _Pocillopora_ samples  (Supplementary Fig. 3c)**](#PSBA)  
        A. [Identification of psbA<sup>ncr</sup> sequences in each _Pocillopora_ colonies](#PSBA-A)  
        B. [Multiple alignement and Bayesian phylogeny of psbA<sup>ncr</sup> sequences](#PSBA-B)  
        C. [Tree representation on R (Supplementary Fig. 3c)](#PSBA-C)  
