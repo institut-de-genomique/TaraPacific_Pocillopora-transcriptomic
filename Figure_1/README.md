@@ -139,7 +139,50 @@ write.nexus(as.phylo(dendITS), file="Cladocopium_ITS2.dendrogram.nex")
 ```
 
 ## 2. Identification of _Cladocopium_ lineages with SNPs called on transcriptomic reads.  <a name="SNP"></a>
-### A. SNP calling <a name="SNP-A"></a>
+### A. SNP calling with GATK v3.7.0 <a name="SNP-A"></a>
+
+The pipeline to obtain alignment files on *Cladocopium* CDS is in the Coral Gene Expression directory  
+
+```bash
+picard CreateSequenceDictionary R=Cladocopium-transcript.fasta O=Cladocopium-transcript.dict
+#For each Sample  
+# Create Realignment Targets : This is the first step in a two-step process of realigning around indels
+gatk -T RealignerTargetCreator -R Cladocopium-transcript.fasta -I SAMPLE_Cladocopium.bam -o SAMPLE_Cladocopium.realignment_targets.list
+
+#Realign Indels : This step performs the realignment around the indels which were identified in the previous step (the ‘realignment targets’)
+gatk -T IndelRealigner -R Cladocopium-transcript.fasta -I SAMPLE_Cladocopium.bam -targetIntervals SAMPLE_Cladocopium.realignment_targets.list -o SAMPLE_Cladocopium.realignment.bam
+
+#Call Variants on Individual Files (as gVCF in GATK v.3.7.0)
+gatk -T HaplotypeCaller -R Cladocopium-transcript.fasta -nct 32 -ploidy 1 --emitRefConfidence GVCF -I SAMPLE_Cladocopium.bam -o SAMPLE_Cladocopium.g.vcf
+
+#Perform joint genotyping (i.e., SNP Calling) on all sample gVCF files : Get all island cohort files ending with g.vcf for a species and add --variant before them:
+samples=$(find . | sed 's/.\///' | grep -E 'g.vcf$' | sed 's/^/--variant /')
+gatk -T GenotypeGVCFs -R Cladocopium-transcript.fasta -o AllSamples_Cladocopium.genotyping.vcf -V $(echo $samples)
+gzip AllSamples_Cladocopium.genotyping.vcf
+
+#Filter VCF to Keep Only biallelic variants
+vcftools --gzvcf AllSamples_Cladocopium.genotyping.vcf.gz --min-alleles 2 --max-alleles 2 --recode --recode-INFO-all --out AllSamples_Cladocopium.genotyping.biallelic.vcf
+
+vcftools --gzvcf Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Merged-Removed-D2.vcf.gz --min-alleles 2 --max-alleles 2 --recode --recode-INFO-all --out Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Merged-Removed-D2-Biallelic.vcf
+
+# 19. Compressed results
+gzip Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Perform-Genotyping-Removed-D2-Biallelic.vcf
+
+gzip Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Merged-Removed-D2-Biallelic.vcf
+
+# 20. Use bcftools to have some filtering on VCF files
+bcftools view -i '%QUAL>=30' Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Perform-Genotyping-Removed-D2-Biallelic.vcf.gz -O z -o Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Perform-Genotyping-Removed-D2-Biallelic-SQ-30.vcf.gz
+
+bcftools view -i '%QUAL>=30' Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Merged-Removed-D2-Biallelic.vcf.gz -O z -o Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Merged-Removed-D2-Biallelic-SQ-30.vcf.gz
+
+#############
+## STEP 24 ##
+#############
+ls *-SQ-30.vcf | while read a; do jobify -b "python program-jlehoang-SNP-Filtering-Coverage-Biallelic-NA-Filtering-Frequency.py $a SNP-Filtering-Coverage-Biallelic-${a%.vcf}-Combined.txt SNP-Filtering-Coverage-Biallelic-${a%.vcf}-Frequency.txt SNP-Filtering-NA-Coverage-Biallelic-${a%.vcf}-Coverage.txt 10 SNP-Filtering-NA-Coverage-Biallelic-${a%.vcf}-Frequency-NA-Filtering.txt"; done
+
+
+
+
 
 ### B. Hierarchical clustering of SNP frequencies (Supplementary Fig. 3a) <a name="SNP-B"></a>
 
