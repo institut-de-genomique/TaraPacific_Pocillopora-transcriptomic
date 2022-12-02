@@ -1,5 +1,10 @@
 # Identification of _Cladocopium_ lineages 
-We used three independant methods to identify _Cladocopium_ lineages.  
+We used three independant methods to identify _Cladocopium_ lineages.
+
+import TOCInline from '@theme/TOCInline';
+
+<TOCInline toc={toc} />
+
 
 ## 1. Identification of _Cladocopium_ lineages with ITS2 sequences.
 ITS2 sequences are available under the PRJEB52458 project and were obtained following the procedure detailed here : https://arxiv.org/abs/2207.02475  
