@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-
 ########################################################################################################################
 ## To have mean coverage, mean identity and count reads, that mapped on transcriptome reference, order by transcripts ##
-## In: Sam-Carac results; 					   	                                              ##
+## From: Sam-Carac results; 					   	                                              ##
 ## Author: Julie Lê-Hoang		 		                                                              ##
 ## Contact : lehoang.julie@hotmail.fr                                                                                 ##
 ## Date: 20/03/2018			                                                             		      ##	
