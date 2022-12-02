@@ -2,7 +2,9 @@
 This directory contains the tools needed to calculate the number of RNAseq reads aligned on each gene of the *Pocillopora* coral and its *Cladocopium* symbiont. 
 The command lines are below  
 
-RNAseq reads from 102 *Pocillopora coral colonies* are available at the ebi under the project number : PRJEB52301
+RNAseq reads from 102 *Pocillopora coral colonies* are available at the ebi under the project number : PRJEB52301  
+
+The complete table of gene expression for *Pocillopora* and *Cladocopium* are available at https://doi.org/10.5281/zenodo.6341761  
 
 ## 1. *Cladocopium* goreaui *Durusdinium*
 
