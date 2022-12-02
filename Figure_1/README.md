@@ -157,32 +157,19 @@ gatk -T HaplotypeCaller -R Cladocopium-transcript.fasta -nct 32 -ploidy 1 --emit
 
 #Perform joint genotyping (i.e., SNP Calling) on all sample gVCF files : Get all island cohort files ending with g.vcf for a species and add --variant before them:
 samples=$(find . | sed 's/.\///' | grep -E 'g.vcf$' | sed 's/^/--variant /')
-gatk -T GenotypeGVCFs -R Cladocopium-transcript.fasta -o AllSamples_Cladocopium.genotyping.vcf -V $(echo $samples)
-gzip AllSamples_Cladocopium.genotyping.vcf
+gatk -T GenotypeGVCFs -R Cladocopium-transcript.fasta -o AllSamples_Cladocopium.vcf -V $(echo $samples)
+gzip AllSamples_Cladocopium.vcf
 
 #Filter VCF to Keep Only biallelic variants
-vcftools --gzvcf AllSamples_Cladocopium.genotyping.vcf.gz --min-alleles 2 --max-alleles 2 --recode --recode-INFO-all --out AllSamples_Cladocopium.genotyping.biallelic.vcf
+vcftools --gzvcf AllSamples_Cladocopium.genotyping.vcf.gz --min-alleles 2 --max-alleles 2 --recode --recode-INFO-all --out AllSamples_Cladocopium.biallelic.vcf
+gzip AllSamples_Cladocopium.biallelic.vcf
 
-vcftools --gzvcf Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Merged-Removed-D2.vcf.gz --min-alleles 2 --max-alleles 2 --recode --recode-INFO-all --out Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Merged-Removed-D2-Biallelic.vcf
+#Quality filtering with BCFtools
+bcftools view -i '%QUAL>=30' AllSamples_Cladocopium.biallelic.vcf.gz -O z -o AllSamples_Cladocopium.biallelic-SQ-30.vcf.gz
 
-# 19. Compressed results
-gzip Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Perform-Genotyping-Removed-D2-Biallelic.vcf
-
-gzip Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Merged-Removed-D2-Biallelic.vcf
-
-# 20. Use bcftools to have some filtering on VCF files
-bcftools view -i '%QUAL>=30' Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Perform-Genotyping-Removed-D2-Biallelic.vcf.gz -O z -o Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Perform-Genotyping-Removed-D2-Biallelic-SQ-30.vcf.gz
-
-bcftools view -i '%QUAL>=30' Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Merged-Removed-D2-Biallelic.vcf.gz -O z -o Population-Structure-DualT-CSW-Cladocopium-C1-CDS-All-Samples-Merged-Removed-D2-Biallelic-SQ-30.vcf.gz
-
-#############
-## STEP 24 ##
-#############
-ls *-SQ-30.vcf | while read a; do jobify -b "python program-jlehoang-SNP-Filtering-Coverage-Biallelic-NA-Filtering-Frequency.py $a SNP-Filtering-Coverage-Biallelic-${a%.vcf}-Combined.txt SNP-Filtering-Coverage-Biallelic-${a%.vcf}-Frequency.txt SNP-Filtering-NA-Coverage-Biallelic-${a%.vcf}-Coverage.txt 10 SNP-Filtering-NA-Coverage-Biallelic-${a%.vcf}-Frequency-NA-Filtering.txt"; done
-
-
-
-
+#SNP selection: min 4x ; 5% of alternative allele and 10% NA
+SNP_filtering.pl -in AllSamples_Cladocopium.biallelic-SQ-30.vcf.gz -MinCover 4 -out AllSamples_Cladocopium.biallelic-SQ-30_min4x
+```
 
 ### B. Hierarchical clustering of SNP frequencies (Supplementary Fig. 3a) <a name="SNP-B"></a>
 
