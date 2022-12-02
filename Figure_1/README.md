@@ -10,7 +10,7 @@ We used three independant methods to identify _Cladocopium_ lineages.
        A. [SNP calling](#SNP-A)  
        B. [Hierarchical clustering of SNP frequencies (Supplementary Fig. 3a)](#SNP-B)  
        
-3. [**Analysis of psbA<sup>ncr</sup> sequences in _Pocillopora_ samples  (Supplementary Fig. 3c)**](#PSBA)  
+3. [**Analysis of psbA<sup>ncr</sup> sequences in _Pocillopora_ samples**](#PSBA)  
        A. [Identification of psbA<sup>ncr</sup> sequences in each _Pocillopora_ colonies](#PSBA-A)  
        B. [Multiple alignement and Bayesian phylogeny of psbA<sup>ncr</sup> sequences](#PSBA-B)  
        C. [Tree representation on R (Supplementary Fig. 3c)](#PSBA-C)  
@@ -209,7 +209,7 @@ dendCombined<-dendlist(dendITS4, dendSNP4)
 dend_diff(dendCombined)
 ```
 
-## 3. Analysis of psbA<sup>ncr</sup> sequences in _Pocillopora_ samples  (Supplementary Fig. 3c) <a name="PSBA"></a>
+## 3. Analysis of psbA<sup>ncr</sup> sequences in _Pocillopora_ samples <a name="PSBA"></a>
 
 We analyzed the non-coding region of the psbA gene (psbA<sup>ncr</sup>) to assign _Cladocopium_ lineages to known _Cladocopium_ species following the method used in Johnston et al 2022 (https://pubmed.ncbi.nlm.nih.gov/35960256/) and Turnham et al 2021 (https://www.nature.com/articles/s41396-021-01007-8). The code below describes : (A) The mapping of metagenomic reads of the 82 _Pocillopora_ corals containing Cladocopium symbionts on 3 psbAncr sequences (C. latusorum MW819767.1, C. pacificum MW861717, and C. goreaui KF572161.1) the build of consensus sequences for each sample. (B) The alignement then construction of Bayesian phylogeny using 2 psbA<sup>ncr</sup> sequences for each Cladocopium clade identified in Johnston et al 2022 and and the 82 consensus sequences. (C) The representation of the phylogeny with R (Supplementary Fig. 3c).
 
