@@ -14,7 +14,7 @@ The *Durusdinium* transcriptome is available at  https://doi.org/10.1186/1471-21
 cat Cladocopium-CDS.fa Durusdinium-transcripts.fa > Symbiodiniaceae-transcriptome.fa
 bwa index Symbiodiniaceae-transcriptome.fa
 ```
-### A. Read alignement with BWA-mem v0.7.15 and filtering
+### B. Read alignement with BWA-mem v0.7.15 and filtering
 For each *Pocillopora* readset
 ```bash
 bwa mem -t 6 -M Symbiodiniaceae-transcriptome.fa READ1.fq READ2.fa | samtools view -b -@ 6 -F 4 /dev/stdin -o SAMPLE_Symbiodiniaceae.aln.bam;done
