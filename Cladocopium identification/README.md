@@ -147,7 +147,7 @@ The pipeline to obtain alignment files on *Cladocopium* CDS is in the Coral Gene
 picard CreateSequenceDictionary R=Cladocopium-transcript.fasta O=Cladocopium-transcript.dict
 #For each Sample  
 # Create Realignment Targets : This is the first step in a two-step process of realigning around indels
-gatk -T RealignerTargetCreator -R Cladocopium-transcript.fasta -I SAMPLE_Cladocopium.bam -o SAMPLE_Cladocopium.realignment_targets.list
+gatk -T RealignerTargetCreator -R Cladocopium-transcript.fasta -I SAMPLE_Cladocopium.aln.sort.bam -o SAMPLE_Cladocopium.realignment_targets.list
 
 #Realign Indels : This step performs the realignment around the indels which were identified in the previous step (the ‘realignment targets’)
 gatk -T IndelRealigner -R Cladocopium-transcript.fasta -I SAMPLE_Cladocopium.bam -targetIntervals SAMPLE_Cladocopium.realignment_targets.list -o SAMPLE_Cladocopium.realignment.bam
@@ -168,7 +168,7 @@ gzip AllSamples_Cladocopium.biallelic.vcf
 bcftools view -i '%QUAL>=30' AllSamples_Cladocopium.biallelic.vcf.gz -O z -o AllSamples_Cladocopium.biallelic-SQ-30.vcf.gz
 
 #SNP selection: min 4x ; 5% of alternative allele and 10% NA
-SNP_filtering.pl -in AllSamples_Cladocopium.biallelic-SQ-30.vcf.gz -MinCover 4 -out AllSamples_Cladocopium.biallelic-SQ-30_min4x
+SNP_filtering.pl -in AllSamples_Cladocopium.biallelic-SQ-30.vcf.gz -MinCover 4 -out Cladocopium_FilteredSNPs_4x
 ```
 
 ### B. Hierarchical clustering of SNP frequencies (Supplementary Fig. 3a) <a name="SNP-B"></a>
@@ -177,7 +177,7 @@ SNP_filtering.pl -in AllSamples_Cladocopium.biallelic-SQ-30.vcf.gz -MinCover 4 -
 library(dendextend)
 
 #SNP frequencies loading
-tab<-read.table("Cladocopium-selected-SNPs.tab",h=T,check.names = F)
+tab<-read.table("Cladocopium_FilteredSNPs_4x.freq.tab",h=T,check.names = F)
 colnames(tab)<-sub("_.*","",colnames(tab))
 
 #Selection of 82 samples containing a single Cladocopium species.
