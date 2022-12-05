@@ -17,7 +17,7 @@ cat Cladocopium-CDS.fa Durusdinium-transcripts.fa > Symbiodiniaceae-transcriptom
 bwa index Symbiodiniaceae-transcriptome.fa
 ```
 ### B. Read alignement with BWA-mem v0.7.15 and filtering
-For each *Pocillopora* readset
+For each metatranscriptomic readset of *Pocillopora* colony  
 ```bash
 bwa mem -t 6 -M Symbiodiniaceae-transcriptome.fa READ1.fq READ2.fa | samtools view -b -@ 6 -F 4 /dev/stdin -o SAMPLE_Symbiodiniaceae.aln.bam;done
 #BamFilters tool is available here : https://github.com/institut-de-genomique/bamFilters
@@ -26,7 +26,6 @@ samtools sort -@ 1 -o SAMPLE_Symbiodiniaceae.98i-80l.sort.bam SAMPLE_Symbiodinia
 samtools index SAMPLE_Symbiodiniaceae.aln.sort.98i-80l.sort.bam
 ```
 ### C. Calculation of read count per gene for *Cladocopium*
-For each *Pocillopora* readset
 ```bash
 sam-carac -b SAMPLE_Symbiodiniaceae.aln.sort.98i-80l.sort.bam -s allbest -a -p -o SAMPLE_Symbiodiniaceae.aln.sort.98i-80l.carac
 sort -k 2,2 SAMPLE_Symbiodiniaceae.aln.sort.98i-80l.carac > SAMPLE_Symbiodiniaceae.aln.sort.98i-80l.carac.sort
