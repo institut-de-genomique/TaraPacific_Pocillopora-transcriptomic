@@ -51,15 +51,14 @@ library(RColorBrewer)
 set<-brewer.pal(8,"Set2")
 
 #For the Symbiont.
-library(ggplot2)
 Varpart<-read.table(file="Varpart_Symbiont-combined_formated.tab",sep="\t",h=T)
 Varpart2<-Varpart[,2:101]
 Varpart3<-data.frame(Gene=sub("_(Islands|PocilloGG|SymbioGG)","",rownames(Varpart2)),Variable=sub(".*_","",rownames(Varpart2)),VarianceMedian=apply(Varpart2,1,median),sd=apply(Varpart2,1,sd),Q1=apply(Varpart2,1,function(x){quantile(x,probs = 0.25)}),Q3=apply(Varpart2,1,function(x){quantile(x,probs = 0.75)}),row.names = NULL)
 Varpart3<-Varpart3[order(Varpart3$VarianceMedian,decreasing = T),]
 Varpart3$Gene<-factor(Varpart3$Gene,levels=unique(Varpart3$Gene))
 
-head(Varpart3)
-
+#Figure 3a
+library(ggplot2)
 pdf(file="VariancePartitionSymbiont_batchcorrected_I04corrected.pdf",width=9)
 ggplot(Varpart3[Varpart3$VarianceMedian>=0.5,])+ 
   geom_violin(scale = "count",size=0.1,aes(x=Variable,y=VarianceMedian*100,fill=Variable))+ 
@@ -79,6 +78,7 @@ Varpart3<-data.frame(Gene=sub("_(Islands|PocilloGG|SymbioGG)","",rownames(Varpar
 Varpart3<-Varpart3[order(Varpart3$VarianceMedian,decreasing = T),]
 Varpart3$Gene<-factor(Varpart3$Gene,levels=unique(Varpart3$Gene))
 
+#Figure 3b
 pdf(file="VariancePartitionHost_batchcorrected_I04corrected.pdf",width=9)
 ggplot(Varpart3[Varpart3$VarianceMedian>=0.5,])+ 
   geom_violin(scale = "count",size=0.1,aes(x=Variable,y=VarianceMedian*100,fill=Variable))+ 
