@@ -1,4 +1,4 @@
-# Selection of top environmental variables and constrained correspondance analysis (CCA)
+# Selection of top environmental variables and constrained correspondence analysis (CCA)
 
 To produce Figure 5 of the article, the following files are required:
 -the associations between host, symbiont, and island: Variables11Islands.txt in this directory
