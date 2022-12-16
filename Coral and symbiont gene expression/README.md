@@ -49,3 +49,21 @@ samtools sort -@ 1 -o SAMPLE_Pocillopora_meandrina_v3.aln.sort.bam SAMPLE_Pocill
 bamFilters -i 95 -a 50 -r 75 -n 30 -b $a -o SAMPLE_Pocillopora_meandrina_v3.aln.sort.95i-50l.bam
 samtools index SAMPLE_Pocillopora_meandrina_v3.aln.sort.95i-50l.bam
 ```
+### C. Calculation of read count per gene for *Pocillopora* with htseq-count v0.9.1
+```bash
+htseq-count --format bam --order pos --type CDS --idattr Parent -s reverse SAMPLE_Pocillopora_meandrina_v3.aln.sort.95i-50l.bam Pocillopora_meandrina_v3.1.annot.gff > SAMPLE_Pocillopora_meandrina_v3.aln.sort.95i-50l.bam.htseqcount.txt
+grep -v "__" SAMPLE_Pocillopora_meandrina_v3.aln.sort.95i-50l.bam.htseqcount.txt > SAMPLE_Pocillopora_meandrina_v3.aln.sort.95i-50l.bam.htseqcount.noacct.txt
+```
+Concatenate individual count files into raw count table in R:
+```bash
+sampleFiles <- list.files(path = "PATH_TO_htseqcount.noacct.txt_FILES")
+sampleTable <- data.frame(sampleName = substr(unique(sampleFiles), 1, 9), 
+                          fileName = sampleFiles, 
+                          islandName = substr(unique(sampleFiles), 1, 3))
+library("DESeq2")
+ddsHTSeq <- DESeqDataSetFromHTSeqCount(sampleTable = sampleTable,
+                                       directory = "PATH_TO_htseqcount.noacct.txt_FILES",
+                                       design = ~ islandName)
+write.table(counts(ddsHTSeq, normalized = FALSE), 
+            file = "Pocillopora_MetaT_ReadCount.tab", quote = F)
+```
