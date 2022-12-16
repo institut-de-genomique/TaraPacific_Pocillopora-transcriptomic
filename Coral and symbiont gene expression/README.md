@@ -34,7 +34,7 @@ python Read-count-per-gene.py SAMPLE_Symbiodiniaceae.aln.sort.98i-80l.carac.sort
 
 ## 2. *Pocillopora* host
 
-The *Pocillopora* genome is available at XXX
+The *Pocillopora* genome is available at https://www.genoscope.cns.fr/corals/genomes.html
 
 ### A. Reference index
 ```bash
