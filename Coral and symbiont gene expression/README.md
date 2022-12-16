@@ -19,7 +19,7 @@ bwa index Symbiodiniaceae-transcriptome.fa
 ### B. Read alignement with BWA-mem v0.7.15 and filtering
 For each metatranscriptomic readset of *Pocillopora* colony  
 ```bash
-bwa mem -t 6 -M Symbiodiniaceae-transcriptome.fa READ1.fq READ2.fa | samtools view -b -@ 6 -F 4 /dev/stdin -o SAMPLE_Symbiodiniaceae.aln.bam;done
+bwa mem -t 6 -M Symbiodiniaceae-transcriptome.fa READ1.fq READ2.fq | samtools view -b -@ 6 -F 4 /dev/stdin -o SAMPLE_Symbiodiniaceae.aln.bam
 #BamFilters tool is available here : https://github.com/institut-de-genomique/bamFilters
 bamFilters -i 98 -a 80 -r 75 -n 30 -b $a -o SAMPLE_Symbiodiniaceae.98i-80l.bam
 samtools sort -@ 1 -o SAMPLE_Symbiodiniaceae.98i-80l.sort.bam SAMPLE_Symbiodiniaceae.98i-80l.bam
@@ -33,3 +33,19 @@ python Read-count-per-gene.py SAMPLE_Symbiodiniaceae.aln.sort.98i-80l.carac.sort
 ```
 
 ## 2. *Pocillopora* host
+
+The *Pocillopora* genome is available at XXX
+
+### A. Reference index
+```bash
+bwa index Pocillopora_meandrina_v3.fa
+```
+### B. Read alignement with BWA-mem v0.7.15 and filtering
+For each metatranscriptomic readset of *Pocillopora* colony  
+```bash
+bwa mem -t 12 -M Pocillopora_meandrina_v3.fa READ1.fq READ2.fq | samtools view -b -@ 12 -F 4 /dev/stdin -o SAMPLE_Pocillopora_meandrina_v3.aln.bam
+samtools sort -@ 1 -o SAMPLE_Pocillopora_meandrina_v3.aln.sort.bam SAMPLE_Pocillopora_meandrina_v3.aln.bam
+#BamFilters tool is available here : https://github.com/institut-de-genomique/bamFilters
+bamFilters -i 95 -a 50 -r 75 -n 30 -b $a -o SAMPLE_Pocillopora_meandrina_v3.aln.sort.95i-50l.bam
+samtools index SAMPLE_Pocillopora_meandrina_v3.aln.sort.95i-50l.bam
+```
