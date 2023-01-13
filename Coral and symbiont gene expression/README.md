@@ -55,7 +55,7 @@ htseq-count --format bam --order pos --type CDS --idattr Parent -s reverse SAMPL
 grep -v "__" SAMPLE_Pocillopora_meandrina_v3.aln.sort.95i-50l.bam.htseqcount.txt > SAMPLE_Pocillopora_meandrina_v3.aln.sort.95i-50l.bam.htseqcount.noacct.txt
 ```
 Concatenate individual count files into raw count table in R:
-```bash
+```R
 sampleFiles <- list.files(path = "PATH_TO_htseqcount.noacct.txt_FILES")
 sampleTable <- data.frame(sampleName = substr(unique(sampleFiles), 1, 9), 
                           fileName = sampleFiles, 
