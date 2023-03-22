@@ -63,7 +63,7 @@ Varpart4<-data.frame(dcast(setDT(Varpart3),Gene~Variable,fill = 0,value.var = c(
 Varpart4$Residuals<-1-rowSums(Varpart4[,grep("VarianceMedian",colnames(Varpart4))])
 #Elimination of genes <0.5
 Varpart5<-Varpart4[apply(Varpart4[,grep("VarianceMedian",colnames(Varpart4))],1,max)>0.5,]
-write.table(Varpart5,sep="\t",quote=F,row.names = F,file="VarpartSubsampled_Symbiont_selected.tab")
+write.table(Varpart5,sep="\t",quote=F,row.names = F,file="VarpartSubsampled_Symbiont_selected.tsv")
 
 #Figure 3a
 library(ggplot2)
@@ -92,7 +92,7 @@ Varpart4<-data.frame(dcast(setDT(Varpart3),Gene~Variable,fill = 0,value.var = c(
 Varpart4$Residuals<-1-rowSums(Varpart4[,grep("VarianceMedian",colnames(Varpart4))])
 #Elimination of genes <0.5
 Varpart5<-Varpart4[apply(Varpart4[,grep("VarianceMedian",colnames(Varpart4))],1,max)>0.5,]
-write.table(Varpart5,sep="\t",quote=F,row.names = F,file="VarpartSubsampled_Host_selected.tab")
+write.table(Varpart5,sep="\t",quote=F,row.names = F,file="VarpartSubsampled_Host_selected.tsv")
 
 #Figure 3b
 pdf(file="VariancePartitionHost_batchcorrected_I04corrected.pdf",width=9)
