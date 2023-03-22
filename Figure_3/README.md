@@ -56,7 +56,14 @@ Varpart2<-Varpart[,2:101]
 Varpart3<-data.frame(Gene=sub("_(Islands|PocilloGG|SymbioGG)","",rownames(Varpart2)),Variable=sub(".*_","",rownames(Varpart2)),VarianceMedian=apply(Varpart2,1,median),sd=apply(Varpart2,1,sd),Q1=apply(Varpart2,1,function(x){quantile(x,probs = 0.25)}),Q3=apply(Varpart2,1,function(x){quantile(x,probs = 0.75)}),row.names = NULL)
 Varpart3<-Varpart3[order(Varpart3$VarianceMedian,decreasing = T),]
 Varpart3$Gene<-factor(Varpart3$Gene,levels=unique(Varpart3$Gene))
-write.table(Varpart3[Varpart3$VarianceMedian>=0.5,],sep="\t",quote=F,row.names = F,file="VarpartSubsampled_Symbiont_all.tab")
+
+#Addition of residuals
+library(data.table)
+Varpart4<-data.frame(dcast(setDT(Varpart3),Gene~Variable,fill = 0,value.var = c("VarianceMedian","sd","Q1","Q3")))
+Varpart4$Residuals<-1-rowSums(Varpart4[,grep("VarianceMedian",colnames(Varpart4))])
+#Elimination of genes <0.5
+Varpart5<-Varpart4[apply(Varpart4[,grep("VarianceMedian",colnames(Varpart4))],1,max)>0.5,]
+write.table(Varpart5,sep="\t",quote=F,row.names = F,file="VarpartSubsampled_Symbiont_selected.tab")
 
 #Figure 3a
 library(ggplot2)
@@ -78,7 +85,14 @@ Varpart2<-Varpart[,2:101]
 Varpart3<-data.frame(Gene=sub("_(Islands|PocilloGG|SymbioGG)","",rownames(Varpart2)),Variable=sub(".*_","",rownames(Varpart2)),VarianceMedian=apply(Varpart2,1,median),sd=apply(Varpart2,1,sd),Q1=apply(Varpart2,1,function(x){quantile(x,probs = 0.25)}),Q3=apply(Varpart2,1,function(x){quantile(x,probs = 0.75)}),row.names = NULL)
 Varpart3<-Varpart3[order(Varpart3$VarianceMedian,decreasing = T),]
 Varpart3$Gene<-factor(Varpart3$Gene,levels=unique(Varpart3$Gene))
-write.table(Varpart3[Varpart3$VarianceMedian>=0.5,],sep="\t",quote=F,row.names = F,file="VarpartSubsampled_Host_all.tab")
+
+#Addition of residuals
+library(data.table)
+Varpart4<-data.frame(dcast(setDT(Varpart3),Gene~Variable,fill = 0,value.var = c("VarianceMedian","sd","Q1","Q3")))
+Varpart4$Residuals<-1-rowSums(Varpart4[,grep("VarianceMedian",colnames(Varpart4))])
+#Elimination of genes <0.5
+Varpart5<-Varpart4[apply(Varpart4[,grep("VarianceMedian",colnames(Varpart4))],1,max)>0.5,]
+write.table(Varpart5,sep="\t",quote=F,row.names = F,file="VarpartSubsampled_Host_selected.tab")
 
 #Figure 3b
 pdf(file="VariancePartitionHost_batchcorrected_I04corrected.pdf",width=9)
