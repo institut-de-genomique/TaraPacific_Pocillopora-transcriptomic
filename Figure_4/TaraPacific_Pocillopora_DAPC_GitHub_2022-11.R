@@ -13,6 +13,9 @@
 
   # Step 1 - Set Defaults
 
+    # set directory
+      setwd("C:/Users/uax75/OneDrive/Documents/R/TaraCoral_2020/Final_Results/Pocillopora/ManuscriptDocs/Scripts/Figure4_DAPC")
+
     # Set the prefix for each output file name
       outputPrefix <- "TaraPacific_Pocillopora_DAPC_GitHub_2022-11"
     
@@ -335,13 +338,13 @@
       geom_violin(data=subset(Both_DiscrimGenes, Model %in% c("Pocillopora")), aes(x = Group2, y = LDScore*1000, fill = Group2)) +
       annotate(geom = "text", x = 1, y = 0.015, label = "4,386 genes", size = 10) +
       annotate(geom = "text", x = 2, y = 0.015, label = "1,396 genes", size = 10) +
-      annotate(geom = "text", x = 2, y = 0.01, label = "687 host-dependent\n 709 symbiont-dependent", size = 6) +
+      annotate(geom = "text", x = 2, y = 0.01, label = "687 host-dependent/n 709 symbiont-dependent", size = 6) +
       scale_fill_manual(values=c("#66C2A5","#8a128a")) +
       coord_trans(y = "log10") +
       #scale_y_log10() + 
       #scale_y_continuous(trans='log10') +
       scale_y_continuous(limits = c(0.01,10), breaks = c(0,0.03,0.3,1,3,6,9)) +
-      scale_x_discrete(breaks=c("Ile","Lineage"), labels=c("Environment", "Lineage\n(Host + Photosymbiont)")) +
+      scale_x_discrete(breaks=c("Ile","Lineage"), labels=c("Environment", "Lineage/n(Host + Photosymbiont)")) +
       #facet_wrap(~Model) +
       xlab("Variables") +
       #ylab("Loading Score") +
@@ -365,13 +368,13 @@
       geom_violin(data=subset(Both_DiscrimGenes, Model %in% c("Symbiont")), aes(x = Group2, y = LDScore*1000, fill = Group2)) +
       annotate(geom = "text", x = 1, y = 0.015, label = "2,495 genes", size = 10) +
       annotate(geom = "text", x = 2, y = 0.015, label = "2,041 genes", size = 10) +
-      annotate(geom = "text", x = 2, y = 0.01, label = "1,544 host-dependet genes\n 497 symbiont-dependent genes", size = 6) +
+      annotate(geom = "text", x = 2, y = 0.01, label = "1,544 host-dependet genes/n 497 symbiont-dependent genes", size = 6) +
       scale_fill_manual(values=c("#66C2A5","#8a128a")) +
       coord_trans(y = "log10") +
       #scale_y_log10() + 
       #scale_y_continuous(trans='log10') +
       scale_y_continuous(limits = c(0.01,10), breaks = c(0,0.03,0.3,1,3,6,9)) +
-      scale_x_discrete(breaks=c("Ile","Lineage"), labels=c("Environment", "Lineage\n(Symbiont + Photosymbiont)")) +
+      scale_x_discrete(breaks=c("Ile","Lineage"), labels=c("Environment", "Lineage/n(Symbiont + Photosymbiont)")) +
       #facet_wrap(~Model) +
       xlab("Variables") +
       #ylab("Loading Score") +
@@ -584,15 +587,16 @@
               legend.box ='horizontal')
       PCbox_ile
       
+      options(ggrepel.max.overlaps = Inf)
       plot_dapc_ile <- ggplot() +
         stat_ellipse(data=gg_ile, geom="polygon", aes(x=LD1,y=LD2,color=Ile, fill=TSA_hist), 
                      type="t", level=0.95, alpha=0.5, show.legend=F) +
         geom_segment(data=gg_ile, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Ile)) +
         annotate(geom="text", x=7, y=-10, 
-                 label=paste("Proportion Reassigned \n", VarExp_Host_mean_ile, "?", VarExp_Host_sd_ile, sep=' '),
+                 label=paste("Proportion Reassigned /n", VarExp_Host_mean_ile, "?", VarExp_Host_sd_ile, sep=' '),
                  color="black", size = 14) +
-        scale_fill_distiller(palette = "Spectral") +
+        scale_fill_distiller(palette = "RdBu") +
         scale_color_manual(values=mycols,
                            name = "Island",
                            labels = c("Las Perlas", "Coiba", "Malpelo",
@@ -636,7 +640,7 @@
       library(reshape2)
       plot_TSA <- ggplot() +
         geom_point(data=TSA_hist, aes(x=Ile, y = TSA_heat_mean_DegC, fill=TSA_heat_mean_DegC), shape=21) +
-        scale_fill_distiller(palette = "Spectral",
+        scale_fill_distiller(palette = "RdBu",
                              name = "Climatological Mean TSA (?C)")
       plot_TSA
         
@@ -709,7 +713,7 @@
         geom_segment(data=gg_clade, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Clade)) +
         annotate(geom="text", x=-27.5, y=-16,
-                 label=paste("Proportion Reassigned \n", VarExp_Host_mean_clade, "?", VarExp_Host_sd_clade, sep=' '),
+                 label=paste("Proportion Reassigned /n", VarExp_Host_mean_clade, "?", VarExp_Host_sd_clade, sep=' '),
                  color="black", size = 14) +
         scale_color_manual(values=mycols_clade,
                            name = "SVD Clade",
@@ -796,7 +800,7 @@
         geom_segment(data=gg_symclade, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Clade)) +
         annotate(geom="text", x=8, y=-16,
-                 label=paste("Proportion Reassigned \n", VarExp_Host_mean_symclade, "?", VarExp_Host_sd_symclade, sep=' '),
+                 label=paste("Proportion Reassigned /n", VarExp_Host_mean_symclade, "?", VarExp_Host_sd_symclade, sep=' '),
                  color="black", size = 14) +
         scale_color_manual(values=mycols_symclade[c(3:7)],
                              name = "Cladocopium Lineage",
@@ -880,7 +884,7 @@
         geom_segment(data=gg_ile_symb, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Ile)) +
         annotate(geom="text", x=70, y=10,
-                 label=paste("Proportion Reassigned \n", VarExp_Sym_mean_ile, "?", VarExp_Sym_sd_ile, sep=' '),
+                 label=paste("Proportion Reassigned /n", VarExp_Sym_mean_ile, "?", VarExp_Sym_sd_ile, sep=' '),
                  color="black", size = 14) +
         scale_color_manual(values=mycols,
                            name = "Island",
@@ -968,7 +972,7 @@
         geom_segment(data=gg_ile_symb, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Ile)) +
         annotate(geom="text", x=-35, y=10,
-                 label=paste("Proportion Reassigned \n", VarExp_Sym_mean_ile,  " ? ", VarExp_Sym_sd_ile, sep =' '),
+                 label=paste("Proportion Reassigned /n", VarExp_Sym_mean_ile,  " ? ", VarExp_Sym_sd_ile, sep =' '),
                  color="black", size = 14) +
         scale_color_manual(values=mycols,
                            name = "Island",
@@ -1053,7 +1057,7 @@
         geom_segment(data=gg_clade_symb, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Clade)) +
         annotate(geom="text", x=-35, y=10,
-                 label=paste("Proportion Reassigned \n", VarExp_Sym_mean_clade,  " ? ", VarExp_Sym_sd_clade, sep =' '),
+                 label=paste("Proportion Reassigned /n", VarExp_Sym_mean_clade,  " ? ", VarExp_Sym_sd_clade, sep =' '),
                  color="black", size = 14) +
         scale_color_manual(values=mycols_clade,
                            name = "SVD Clade",
@@ -1136,7 +1140,7 @@
         geom_segment(data=gg_symclade_symb, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=SymClade)) +
         annotate(geom="text", x=-35, y=10,
-                 label=paste("Proportion Reassigned \n", VarExp_Sym_mean_symclade,  " ? ", VarExp_Sym_sd_symclade, sep =' '),
+                 label=paste("Proportion Reassigned /n", VarExp_Sym_mean_symclade,  " ? ", VarExp_Sym_sd_symclade, sep =' '),
                  color="black", size = 14) +
         scale_color_manual(values=mycols_symclade[c(3:7)],
                            name = "Cladocopium Group",
@@ -1340,15 +1344,16 @@
                             high="#FFF94C",
                             name = "p-value") +
         scale_size_continuous(range = c(5, 10)) +
-        facet_grid(Loading~.,
+        facet_grid(.~Loading,
                    drop = TRUE,
-                   scales = "free_y") +
+                   scales = "free_x") +
         xlab("") +
         ylab("Count Ratio") +
         scale_x_discrete(expand = c(0.01, 0.2)) +
-        coord_flip() +
+        #coord_flip() +
         theme_bw(base_size=9) + 
-        theme(text = element_text(size = 20, face = 'bold')) +
+        theme(text = element_text(size = 40, face = 'bold'),
+              axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
         guides(size = guide_legend(title="DEGs", order = 1))
     }
     
@@ -1369,10 +1374,10 @@
     
       # Step 3 - Plot results
 
-    pdf(file = paste0(outputPrefix,"_Host_Ile-LD1-LD2_Dotplot.pdf"), h = 20, w = 20)
+    pdf(file = paste0(outputPrefix,"_Host_Ile-LD1-LD2_Dotplot.pdf"), h = 20, w = 30)
     plotDot
     dev.off()
     
-    png(file = paste0(outputPrefix, "_Host_Ile-LD1-LD2_Dotplot.png"), h = 20, w = 20, units = "in", res = 300)
+    png(file = paste0(outputPrefix, "_Host_Ile-LD1-LD2_Dotplot.png"), h = 20, w = 30, units = "in", res = 300)
     plotDot
     dev.off()
