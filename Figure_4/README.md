@@ -586,6 +586,7 @@ To produce Figure 4 of the article, the following files are required:
               legend.box ='horizontal')
       PCbox_ile
       
+      options(ggrepel.max.overlaps = Inf)
       plot_dapc_ile <- ggplot() +
         stat_ellipse(data=gg_ile, geom="polygon", aes(x=LD1,y=LD2,color=Ile, fill=TSA_hist), 
                      type="t", level=0.95, alpha=0.5, show.legend=F) +
@@ -594,7 +595,7 @@ To produce Figure 4 of the article, the following files are required:
         annotate(geom="text", x=7, y=-10, 
                  label=paste("Proportion Reassigned \n", VarExp_Host_mean_ile, "?", VarExp_Host_sd_ile, sep=' '),
                  color="black", size = 14) +
-        scale_fill_distiller(palette = "Spectral") +
+        scale_fill_distiller(palette = "RdBu") +
         scale_color_manual(values=mycols,
                            name = "Island",
                            labels = c("Las Perlas", "Coiba", "Malpelo",
@@ -638,7 +639,7 @@ To produce Figure 4 of the article, the following files are required:
       library(reshape2)
       plot_TSA <- ggplot() +
         geom_point(data=TSA_hist, aes(x=Ile, y = TSA_heat_mean_DegC, fill=TSA_heat_mean_DegC), shape=21) +
-        scale_fill_distiller(palette = "Spectral",
+        scale_fill_distiller(palette = "RdBu",
                              name = "Climatological Mean TSA (?C)")
       plot_TSA
         
