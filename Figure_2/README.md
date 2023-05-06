@@ -240,10 +240,6 @@ procrustplot <- ggplot(PACo_clades, aes(x=reorder(Clad_clades, phi.mean), y=phi.
                                "SVD4"= mybrew_cols[2],
                                "SVD5"= mybrew_cols[4]))+
   theme(axis.text=element_text(size=8))+
-        # axis.text.y = element_text(colour = rev(vlookup(lookup_value = substr(reorder(PACo_clades$Clad_clades, PACo_clades$phi.mean),1,6),
-        #                                             dict = SymCladeColorTable,
-        #                                             lookup_column = "SymClade",
-        #                                             result_column = "SymColor"))))+
   coord_flip()+
   labs(title="",
        x ="Pocillopora - Cladocopium links", y = "Squared residuals")
