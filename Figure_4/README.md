@@ -15,9 +15,6 @@ To produce Figure 4 of the article, the following files are required:
 
   # Step 1 - Set Defaults
 
-    # Set working directory
-      setwd("C:/Users/uax75/OneDrive/Documents/R/TaraCoral_2020/Final_Results/Pocillopora/ManuscriptDocs/Scripts/Figure4_DAPC/")
-    
     # Set the prefix for each output file name
       outputPrefix <- "TaraPacific_Pocillopora_DAPC_2022-11"
     
