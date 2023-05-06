@@ -3,22 +3,18 @@
 
 # Author: ARMSTRONG Eric 
 # Created: 21 August 2018
-# Last Edited: 16 November 2022
+# Last Edited: 28 November 2022
 
 # Modified from a script by SW Davies obtained here: 
 # https://github.com/daviessw/Cladocopium_Micronesia/blob/master/Cladocopium_Community_Analyses.R
-
 # https://rstudio-pubs-static.s3.amazonaws.com/706490_2e17c2cf656a42cd96252b43ccc98755.html#3_Discriminant_Analysis_of_Principal_Components_(DAPC)
 
 ## 1. INITIALIZATION ------------------------------------------------------------------------------------------------------------------------------------
 
   # Step 1 - Set Defaults
 
-    # Set working directory
-      setwd("C:/Users/uax75/OneDrive/Documents/R/TaraCoral_2020/Final_Results/Pocillopora/ManuscriptDocs/Scripts/Figure4_DAPC/")
-    
     # Set the prefix for each output file name
-      outputPrefix <- "TaraPacific_Pocillopora_DAPC_2022-11"
+      outputPrefix <- "TaraPacific_Pocillopora_DAPC_GitHub_2022-11"
     
 ## 2. LOAD DATA & METADATA -------------------------------------------------------------------------------------------------------------------------------
 
@@ -594,7 +590,7 @@
         geom_segment(data=gg_ile, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Ile)) +
         annotate(geom="text", x=7, y=-10, 
-                 label=paste("Proportion Reassigned \n", VarExp_Host_mean_ile, "±", VarExp_Host_sd_ile, sep=' '),
+                 label=paste("Proportion Reassigned \n", VarExp_Host_mean_ile, "?", VarExp_Host_sd_ile, sep=' '),
                  color="black", size = 14) +
         scale_fill_distiller(palette = "Spectral") +
         scale_color_manual(values=mycols,
@@ -641,7 +637,7 @@
       plot_TSA <- ggplot() +
         geom_point(data=TSA_hist, aes(x=Ile, y = TSA_heat_mean_DegC, fill=TSA_heat_mean_DegC), shape=21) +
         scale_fill_distiller(palette = "Spectral",
-                             name = "Climatological Mean TSA (°C)")
+                             name = "Climatological Mean TSA (?C)")
       plot_TSA
         
       plot_TSA_leg <- get_legend(plot_TSA)
@@ -713,7 +709,7 @@
         geom_segment(data=gg_clade, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Clade)) +
         annotate(geom="text", x=-27.5, y=-16,
-                 label=paste("Proportion Reassigned \n", VarExp_Host_mean_clade, "±", VarExp_Host_sd_clade, sep=' '),
+                 label=paste("Proportion Reassigned \n", VarExp_Host_mean_clade, "?", VarExp_Host_sd_clade, sep=' '),
                  color="black", size = 14) +
         scale_color_manual(values=mycols_clade,
                            name = "SVD Clade",
@@ -800,7 +796,7 @@
         geom_segment(data=gg_symclade, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Clade)) +
         annotate(geom="text", x=8, y=-16,
-                 label=paste("Proportion Reassigned \n", VarExp_Host_mean_symclade, "±", VarExp_Host_sd_symclade, sep=' '),
+                 label=paste("Proportion Reassigned \n", VarExp_Host_mean_symclade, "?", VarExp_Host_sd_symclade, sep=' '),
                  color="black", size = 14) +
         scale_color_manual(values=mycols_symclade[c(3:7)],
                              name = "Cladocopium Lineage",
@@ -884,7 +880,7 @@
         geom_segment(data=gg_ile_symb, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Ile)) +
         annotate(geom="text", x=70, y=10,
-                 label=paste("Proportion Reassigned \n", VarExp_Sym_mean_ile, "±", VarExp_Sym_sd_ile, sep=' '),
+                 label=paste("Proportion Reassigned \n", VarExp_Sym_mean_ile, "?", VarExp_Sym_sd_ile, sep=' '),
                  color="black", size = 14) +
         scale_color_manual(values=mycols,
                            name = "Island",
@@ -972,7 +968,7 @@
         geom_segment(data=gg_ile_symb, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Ile)) +
         annotate(geom="text", x=-35, y=10,
-                 label=paste("Proportion Reassigned \n", VarExp_Sym_mean_ile,  " ± ", VarExp_Sym_sd_ile, sep =' '),
+                 label=paste("Proportion Reassigned \n", VarExp_Sym_mean_ile,  " ? ", VarExp_Sym_sd_ile, sep =' '),
                  color="black", size = 14) +
         scale_color_manual(values=mycols,
                            name = "Island",
@@ -1057,7 +1053,7 @@
         geom_segment(data=gg_clade_symb, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Clade)) +
         annotate(geom="text", x=-35, y=10,
-                 label=paste("Proportion Reassigned \n", VarExp_Sym_mean_clade,  " ± ", VarExp_Sym_sd_clade, sep =' '),
+                 label=paste("Proportion Reassigned \n", VarExp_Sym_mean_clade,  " ? ", VarExp_Sym_sd_clade, sep =' '),
                  color="black", size = 14) +
         scale_color_manual(values=mycols_clade,
                            name = "SVD Clade",
@@ -1140,7 +1136,7 @@
         geom_segment(data=gg_symclade_symb, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=SymClade)) +
         annotate(geom="text", x=-35, y=10,
-                 label=paste("Proportion Reassigned \n", VarExp_Sym_mean_symclade,  " ± ", VarExp_Sym_sd_symclade, sep =' '),
+                 label=paste("Proportion Reassigned \n", VarExp_Sym_mean_symclade,  " ? ", VarExp_Sym_sd_symclade, sep =' '),
                  color="black", size = 14) +
         scale_color_manual(values=mycols_symclade[c(3:7)],
                            name = "Cladocopium Group",
@@ -1201,7 +1197,7 @@
     detach("package:xlsx", unload=T)
     library(openxlsx)
     
-    GO_dat <- read.xlsx("Pocillopora_meandrina_v3.2_annot.xlsx", sheet = "Poc_v3.2_annot.ipr", rowNames = F, colNames = F)
+    GO_dat <- read.xlsx("../Pocillopora_meandrina_v3.2_annot.xlsx", sheet = "Poc_v3.2_annot.ipr", rowNames = F, colNames = F)
       
     library(plyr)
     GO_dat <- ddply(GO_dat, .(X1), summarise,
@@ -1312,15 +1308,26 @@
     library(ggplot2)
       
   # Step 1 - Select the GOSeq results of interest and create an input table for dotplot
-    GOSeqfile <- "Pocillopora_DAPC_SymClade_LD2_GOseq.enriched.txt" #Replace with your GO Enrichment Results from above
-    EnrichTab <- read.table(paste0("./DAPC_GOSeq/",GOSeqfile,sep=''),
+    GOSeqfile1 <- "Pocillopora_DAPC_Ile_LD1_GOseq.enriched.txt" #Replace with your GO Enrichment Results from above
+    EnrichTab1 <- read.table(paste0("./DAPC_GOSeq/",GOSeqfile1,sep=''),
                            header = TRUE, quote="\"",
                            sep=";")
-    EnrichTab$ratio <- EnrichTab$numDEInCat/EnrichTab$numInCat
-    EnrichTab$pval <- EnrichTab$over_represented_pvalue
+    EnrichTab1$ratio <- EnrichTab1$numDEInCat/EnrichTab1$numInCat
+    EnrichTab1$pval <- EnrichTab1$over_represented_pvalue
+    EnrichTab1$Loading <- "Discriminant  Function 1"
+    
+    GOSeqfile2 <- "Pocillopora_DAPC_Ile_LD2_GOseq.enriched.txt" #Replace with your GO Enrichment Results from above
+    EnrichTab2 <- read.table(paste0("./DAPC_GOSeq/",GOSeqfile2,sep=''),
+                           header = TRUE, quote="\"",
+                           sep=";")
+    EnrichTab2$ratio <- EnrichTab2$numDEInCat/EnrichTab2$numInCat
+    EnrichTab2$pval <- EnrichTab2$over_represented_pvalue
+    EnrichTab2$Loading <- "Discriminant Function 2"
+    
+    EnrichTab <- rbind(EnrichTab1, EnrichTab2)
     
   # Step 2 - Create function to make Dotplot of top 100 (showCategory = 100) enriched Biological Process categories
-    dotplot_goseq <- function(df, showCategory=100){
+    dotplot_goseq <- function(df, showCategory=10000){
       df <- df[with(df, order(ratio, pval, decreasing = c(TRUE, FALSE))),]
       df <- head(df, n=showCategory)
       d_plot <- ggplot(subset(df, ontology %in% c("BP")), aes_string(x="term", 
@@ -1333,7 +1340,7 @@
                             high="#FFF94C",
                             name = "p-value") +
         scale_size_continuous(range = c(5, 10)) +
-        facet_grid(ontology~.,
+        facet_grid(Loading~.,
                    drop = TRUE,
                    scales = "free_y") +
         xlab("") +
@@ -1352,10 +1359,20 @@
     
     library(stringr)
     
-    pdf(file = paste0(outputPrefix, "_", substr(paste0(GOSeqfile),1,nchar(paste0(GOSeqfile))-4),"_Dotplot.pdf", sep=''), h = 8.5, w = 20)
+    # pdf(file = paste0(outputPrefix, "_", substr(paste0(GOSeqfile),1,nchar(paste0(GOSeqfile))-4),"_Dotplot.pdf", sep=''), h = 8.5, w = 20)
+    # plotDot
+    # dev.off()
+    # 
+    # png(file = paste0(outputPrefix, "_", substr(paste0(GOSeqfile),1,nchar(paste0(GOSeqfile))-4), "_Dotplot.png", sep=''), h = 8.5, w = 20, units = "in", res = 300)
+    # plotDot
+    # dev.off()
+    
+      # Step 3 - Plot results
+
+    pdf(file = paste0(outputPrefix,"_Host_Ile-LD1-LD2_Dotplot.pdf"), h = 20, w = 20)
     plotDot
     dev.off()
     
-    png(file = paste0(outputPrefix, "_", substr(paste0(GOSeqfile),1,nchar(paste0(GOSeqfile))-4), "_Dotplot.png", sep=''), h = 8.5, w = 20, units = "in", res = 300)
+    png(file = paste0(outputPrefix, "_Host_Ile-LD1-LD2_Dotplot.png"), h = 20, w = 20, units = "in", res = 300)
     plotDot
     dev.off()
