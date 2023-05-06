@@ -77,19 +77,24 @@ library(xlsx)
       list (H.PCo = H.PCo, P.PCo = P.PCo)}
 
 #Genetic clades for the host and the symbiont based on the SNP.
-Variable<-read.table("Variables11Islands.txt",sep="\t",h=T)
+#Variable<-read.table("Variables11Islands.txt",sep="\t",h=T)
+Variable<-read.table("C:/Users/uax75/OneDrive/Documents/R/TaraCoral_2020/Final_Results/Pocillopora/ManuscriptDocs/Scripts/Variables11Islands.txt",sep="\t",h=T)
+
+#Remove hybrid host colony
+library(tidyr)
+Variable <- Variable %>% drop_na(PocilloGG)
 
 # Create data matrix
-HP <- data.frame(matrix(, nrow = length(unique(Variable$PocilloSVD)), ncol = nrow(Variable)))
-colnames(HP) <- CladeTable$Colony
-rownames(HP) <- sort(unique(CladeTable$PocilloSVD))
+HP <- data.frame(matrix(, nrow = length(unique(Variable$PocilloGG)), ncol = nrow(Variable)))
+colnames(HP) <- Variable$Samples
+rownames(HP) <- sort(unique(Variable$PocilloGG))
 
 library(expss)
 for (j in 1:ncol(HP)) {
   HP[,j] <- vlookup(lookup_value = colnames(HP)[j],
-                        dict = CladeTable,
-                        lookup_column = "Colony",
-                        result_column = "PocilloSVD")
+                        dict = Variable,
+                        lookup_column = "Samples",
+                        result_column = "PocilloGG")
   for (k in 1:nrow(HP)) {
     if (HP[k,j] == rownames(HP)[k]) {
       HP[k,j] <- 1
@@ -102,7 +107,7 @@ for (j in 1:ncol(HP)) {
 HP[] <- lapply(HP, function(x) type.convert(as.character(x)))
 
 # Rename colonies so that they match with phylogeny
-colnames(HP) <- gsub("POC0","POC",gsub("C","C0",colnames(HP)))
+#colnames(HP) <- gsub("POC0","POC",gsub("C","C0",colnames(HP)))
 
 #Phylogenetic trees:
 #Read in Pocillopora host tree
@@ -119,7 +124,7 @@ para.D <- cophenetic(TreeP)
 SymbSamples <- TreeP$tip.label
 
 HP <- HP[,c(intersect(SymbSamples,colnames(HP)))] 
-HP <- HP[-c(6),]
+#HP <- HP[-c(6),]
 host.D <- host.D[rownames(HP), rownames(HP)]
 para.D <- para.D[colnames(HP), colnames(HP)]
 
@@ -240,6 +245,10 @@ procrustplot <- ggplot(PACo_clades, aes(x=reorder(Clad_clades, phi.mean), y=phi.
                                "SVD4"= mybrew_cols[2],
                                "SVD5"= mybrew_cols[4]))+
   theme(axis.text=element_text(size=8))+
+        # axis.text.y = element_text(colour = rev(vlookup(lookup_value = substr(reorder(PACo_clades$Clad_clades, PACo_clades$phi.mean),1,6),
+        #                                             dict = SymCladeColorTable,
+        #                                             lookup_column = "SymClade",
+        #                                             result_column = "SymColor"))))+
   coord_flip()+
   labs(title="",
        x ="Pocillopora - Cladocopium links", y = "Squared residuals")
