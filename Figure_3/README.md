@@ -1,14 +1,14 @@
 # Variance partitioning
 
 To obtain Figure 3 of the article required files are :  
--the associations between host, symbiont and island : Variables11Islands.txt in this directory  
--normalized gene expression for the host: Pocillopora_MetaT_TPM.tab available at https://doi.org/10.5281/zenodo.6341761  
--normalized gene expression for the symbiont: CladocopiumC1_MetaT_TPM.tab available at https://doi.org/10.5281/zenodo.6341761 
--the summary table of top variance genes for the host: SummaryTable_upsetR_Host.tab in this directory
--the summary table of top variance geens for the symbiont: SummaryTable_upsetR_Symbiont.tab
--the gene lengths for the host: Pocillopora_meandrina_v3.1.annot.mrna_SeqLengths.txt in this directory
--the read counts for the host: Pocillopora_MetaT_ReadCount.tab in this directory in this directory
--the functional annotations for the host: Pocillopora_meandrina_v3.2_annot.xlsx in the Figure_4 directory
+-the associations between host, symbiont and island : Variables11Islands.txt in this directory <br>
+-normalized gene expression for the host: Pocillopora_MetaT_TPM.tab available at https://doi.org/10.5281/zenodo.6341761 <br>
+-normalized gene expression for the symbiont: CladocopiumC1_MetaT_TPM.tab available at https://doi.org/10.5281/zenodo.6341761 <br>
+-the summary table of top variance genes for the host: SummaryTable_upsetR_Host.tab in this directory <br>
+-the summary table of top variance geens for the symbiont: SummaryTable_upsetR_Symbiont.tab in this directory <br>
+-the gene lengths for the host: Pocillopora_meandrina_v3.1.annot.mrna_SeqLengths.txt in this directory <br>
+-the read counts for the host: Pocillopora_MetaT_ReadCount.tab in this directory in this directory <br>
+-the functional annotations for the host: Pocillopora_meandrina_v3.2_annot.xlsx in the Figure_4 directory <br>
 
 The R script VariancePartition_subsampling.R execute variance partition 5 times with a random subsampling of 2 samples.  
 To get 100 different subsampling, the following command was performed 22 times.
