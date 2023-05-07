@@ -336,11 +336,11 @@
           stat_ellipse(data=subset(ford_POC, Score == 'sites'), geom="polygon", 
                        aes(x=CCA1,y=CCA2,
                            color=factor(vlookup(lookup_value = rownames(data_cts_vsd_env),
-                                                dict = metaData,
+                                                dict = metaData_host,
                                                 lookup_column = "Colony",
                                                 result_column = "Clade")), 
                            fill=factor(vlookup(lookup_value = rownames(data_cts_vsd_env),
-                                                dict = metaData,
+                                                dict = metaData_host,
                                                 lookup_column = "Colony",
                                                 result_column = "Clade"))), 
                    type="t", level=0.68, alpha=0.5, show.legend=F,) +
@@ -355,11 +355,11 @@
           geom_point(data = subset(ford_POC, Score == 'sites'),
                      mapping = aes(x = CCA1, y = CCA2,
                                    shape=factor(vlookup(lookup_value = rownames(data_cts_vsd_env),
-                                                dict = metaData,
+                                                dict = metaData_host,
                                                 lookup_column = "Colony",
                                                 result_column = "Clade")), 
                                    fill=factor(vlookup(lookup_value = rownames(data_cts_vsd_env),
-                                                dict = metaData,
+                                                dict = metaData_host,
                                                 lookup_column = "Colony",
                                                 result_column = "Ile")), size=3)) +
           geom_segment(data = arrows_POC,
@@ -375,9 +375,9 @@
                                        "Rapa Nui", "Ducie", "Gambier", 
                                        "Moorea", "Aitutaki", "Niue",
                                         "Upolu", "Guam")) +
-          scale_shape_manual(name = '', values=c(23,21,24,22,25), #16,17,18,15,4
+          scale_shape_manual(name = '', values=c(23,21,24,22,25,1), #16,17,18,15,4
                            labels=c("P. effusa", "P. meandrina","P. verrucosa", 
-                                    "P. grandis", "SSH5_pver")) +
+                                    "P. grandis", "SSH5_pver","Unknown")) +
           # scale_x_continuous(limits=c(-3.2,3.2), breaks=seq(from=-3, to=3, by=1), labels=seq(from=-3, to=3, by=1)) +
           # scale_y_continuous(limits=c(-3.2,3.2), breaks=seq(from=-3, to=3, by=1), labels=seq(from=-3, to=3, by=1)) +
           theme_bw() +
@@ -387,7 +387,7 @@
           scale_size(guide="none") +
           # guides(fill=F) +
           guides(fill=guide_legend(override.aes=list(color=mycols, size=4))) +
-          guides(shape=guide_legend(override.aes=list(fill=mycols_clade, size=4))) +
+          guides(shape=guide_legend(override.aes=list(fill=c(mycols_clade,"white"), size=4))) +
           theme(legend.direction = 'horizontal',
               legend.position = 'bottom',
               legend.text = element_text(size = 14)) +
@@ -400,11 +400,11 @@
           stat_ellipse(data=subset(ford_POC, Score == 'sites'), geom="polygon", 
                        aes(x=CCA1,y=CCA2,
                            color=factor(vlookup(lookup_value = rownames(data_cts_vsd_env),
-                                                dict = metaData,
+                                                dict = metaData_host,
                                                 lookup_column = "Colony",
                                                 result_column = "Clade")),
                            fill=factor(vlookup(lookup_value = rownames(data_cts_vsd_env),
-                                                dict = metaData,
+                                                dict = metaData_host,
                                                 lookup_column = "Colony",
                                                 result_column = "Clade"))), 
                    type="t", level=0.68, alpha=0.5, show.legend=F,) +
@@ -424,11 +424,11 @@
           geom_point(data = subset(ford_POC, Score == 'sites'),
                      mapping = aes(x = CCA1, y = CCA2,
                                    shape=factor(vlookup(lookup_value = rownames(data_cts_vsd_env),
-                                                dict = metaData,
+                                                dict = metaData_host,
                                                 lookup_column = "Colony",
                                                 result_column = "Clade")),
                                    fill=factor(vlookup(lookup_value = rownames(data_cts_vsd_env),
-                                                dict = metaData,
+                                                dict = metaData_host,
                                                 lookup_column = "Colony",
                                                 result_column = "Ile")), size=3)) +
           geom_segment(data = arrows_POC,
@@ -444,16 +444,16 @@
           #                   labels = c("Las Perlas", "Coiba", "Malpelo", "Rapa Nui",
           #                              "Ducie", "Gambier", "Moorea", "Aitutaki", "Niue",
           #                               "Upolu", "Guam")) +
-          scale_shape_manual(name = '', values=c(23,21,24,22,25), #16,17,18,15,4
+          scale_shape_manual(name = '', values=c(23,21,24,22,25,1), #16,17,18,15,4
                            labels=c("P. effusa", "P. meandrina","P. verrucosa", 
-                                    "P. grandis", "SSH5_pver")) +
+                                    "P. grandis", "SSH5_pver","Unknown")) +
           # scale_x_continuous(limits=c(-3.2,3.2), breaks=seq(from=-3, to=3, by=1), labels=seq(from=-3, to=3, by=1)) +
           # scale_y_continuous(limits=c(-3.2,3.2), breaks=seq(from=-3, to=3, by=1), labels=seq(from=-3, to=3, by=1)) +
           theme_bw() +
           theme(text = element_text(size=20, face="bold")) +
           scale_size(guide="none") +
           guides(fill=F) +
-          guides(shape=guide_legend(override.aes=list(fill=mycols_clade, size=4))) +
+          guides(shape=guide_legend(override.aes=list(fill=c(mycols_clade,"white"), size=4))) +
           # guides(fill=guide_legend(override.aes=list(color=mycols[c(1:2,4:11)], size=2))) +
           # guides(fill=guide_legend(override.aes=list(color=mycols, size=2))) +
           # guides(shape=guide_legend(override.aes=list(fill=mycols2, size=2))) +
@@ -470,11 +470,11 @@
           stat_ellipse(data=subset(ford_SYM, Score == 'sites'), geom="polygon", 
                        aes(x=CCA1,y=CCA2,
                            color=factor(vlookup(lookup_value = rownames(data_cts_sym_vsd_env),
-                                                dict = metaData,
+                                                dict = metaData_sym,
                                                 lookup_column = "Colony",
                                                 result_column = "SymClade")),
                            fill=factor(vlookup(lookup_value = rownames(data_cts_sym_vsd_env),
-                                                dict = metaData,
+                                                dict = metaData_sym,
                                                 lookup_column = "Colony",
                                                 result_column = "SymClade"))), 
                    type="t", level=0.68, alpha=0.5, show.legend=F,) +
@@ -494,11 +494,11 @@
           geom_point(data = subset(ford_SYM, Score == 'sites'),
                      mapping = aes(x = CCA1, y = CCA2,
                                    shape=factor(vlookup(lookup_value = rownames(data_cts_sym_vsd_env),
-                                                dict = metaData,
+                                                dict = metaData_sym,
                                                 lookup_column = "Colony",
                                                 result_column = "SymClade")),
                                    fill=factor(vlookup(lookup_value = rownames(data_cts_sym_vsd_env),
-                                                dict = metaData,
+                                                dict = metaData_sym,
                                                 lookup_column = "Colony",
                                                 result_column = "Ile")), size=3)) +
           geom_segment(data = arrows_SYM,
