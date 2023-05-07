@@ -334,6 +334,8 @@
     Host_DiscrimGenes$Model <- "Pocillopora"
     Both_DiscrimGenes <- rbind(Host_DiscrimGenes, Symb_DiscrimGenes)
     
+    write.table(file = paste0(outputPrefix,"_Figure4a_Data.tab"), Both_DiscrimGenes, quote = F, sep = '\t', row.names = F)
+    
     discrim_Host_violplot <- ggplot() +
       geom_violin(data=subset(Both_DiscrimGenes, Model %in% c("Pocillopora")), aes(x = Group2, y = LDScore*1000, fill = Group2)) +
       annotate(geom = "text", x = 1, y = 0.015, label = "4,386 genes", size = 10) +
@@ -558,6 +560,9 @@
       dapc_ile_PCeig <- data.frame("PC" = seq(from=1, to=length(HostDAPC_ile$pca.eig), by=1),
                                  "PCcumvar" = 100 * cumsum(HostDAPC_ile$pca.eig)/sum(HostDAPC_ile$pca.eig),
                                  "PCkept" = c(rep("Kept",HostDAPC_ile$n.pca),rep("Not",length(HostDAPC_ile$pca.eig)-HostDAPC_ile$n.pca)))
+      
+      write.table(file = paste0(outputPrefix,"_FigureS4a_Data.tab"), dapc_ile_PCeig, quote = F, sep = '\t', row.names = F)
+      write.table(file = paste0(outputPrefix,"_FigureS4b_Data.tab"), dapc_ile_DFeig, quote = F, sep = '\t', row.names = F)
   
       DFbox_ile <- ggplot() +
         geom_bar(data = dapc_ile_DFeig, aes(x=DF,y=DFeigval, fill=DFkept), 
@@ -586,6 +591,8 @@
               text = element_text(size=30, face="bold"),
               legend.box ='horizontal')
       PCbox_ile
+      
+      write.table(file = paste0(outputPrefix,"_Figure4b_Data.tab"), gg_ile, quote = F, sep = '\t', row.names = F)
       
       options(ggrepel.max.overlaps = Inf)
       plot_dapc_ile <- ggplot() +
@@ -670,7 +677,9 @@
       plot_HostDAPC_ile_DF2_TSAfill
       dev.off()
       
-        
+      
+      write.table(file = paste0(outputPrefix,"_FigureS4c_Data.tab"), dapc_clade_DFeig, quote = F, sep = '\t', row.names = F)
+      
       dapc_clade_DFeig <- data.frame("DF" = seq(from=1, to=length(HostDAPC_clade$eig), by=1),
                                    "DFeigval" = HostDAPC_clade$eig,
                                    "DFkept" = c(rep("Kept",2),rep("Not",length(HostDAPC_clade$eig)-2)))
@@ -706,6 +715,7 @@
               legend.box ='horizontal')
       PCbox_clade
       
+      write.table(file = paste0(outputPrefix,"_FigureS6b_Data.tab"), gg_clade, quote = F, sep = '\t', row.names = F)
       
       plot_dapc_clade <- ggplot() +
         stat_ellipse(data=gg_clade, geom="polygon", aes(x=LD1,y=LD2,color=Clade, fill=Clade), 
@@ -757,6 +767,7 @@
       plot_dapc_clade
       dev.off()
       
+      write.table(file = paste0(outputPrefix,"_FigureS4d_Data.tab"), dapc_symclade_DFeig, quote = F, sep = '\t', row.names = F)
       
       dapc_symclade_DFeig <- data.frame("DF" = seq(from=1, to=length(HostDAPC_symclade$eig), by=1),
                                    "DFeigval" = HostDAPC_symclade$eig,
@@ -793,6 +804,7 @@
               legend.box ='horizontal')
       PCbox_symclade
       
+      write.table(file = paste0(outputPrefix,"_FigureS7b_Data.tab"), gg_symclade, quote = F, sep = '\t', row.names = F)
       
       plot_dapc_symclade <- ggplot() +
         stat_ellipse(data=gg_symclade, geom="polygon", aes(x=LD1,y=LD2,color=Clade, fill=Clade), 
@@ -841,8 +853,9 @@
       png(file = paste0(outputPrefix, "_Host_SymClade.png"),  w = 20, h=20, units="in", res=300)
       plot_dapc_symclade
       dev.off()
-        
-        
+    
+    ##### Symbiont DAPC Plots #####
+      
       dapc_ile_symb_DFeig <- data.frame("DF" = seq(from=1, to=length(SymDAPC_ile$eig), by=1),
                                    "DFeigval" = SymDAPC_ile$eig,
                                    "DFkept" = c(rep("Kept",2),rep("Not",length(SymDAPC_ile$eig)-2)))
@@ -850,6 +863,9 @@
                                  "PCcumvar" = 100 * cumsum(SymDAPC_ile$pca.eig)/sum(SymDAPC_ile$pca.eig),
                                  "PCkept" = c(rep("Kept",SymDAPC_ile$n.pca),rep("Not",length(SymDAPC_ile$pca.eig)-SymDAPC_ile$n.pca)))
   
+      write.table(file = paste0(outputPrefix,"_FigureS4e_Data.tab"), dapc_ile_symb_PCeig, quote = F, sep = '\t', row.names = F)
+      write.table(file = paste0(outputPrefix,"_FigureS4f_Data.tab"), dapc_ile_symb_DFeig, quote = F, sep = '\t', row.names = F)
+      
       DFbox_ile_symb <- ggplot() +
         geom_bar(data = dapc_ile_symb_DFeig, aes(x=DF,y=DFeigval, fill=DFkept), 
                  stat="identity", color = "black", show.legend = F) +
@@ -877,6 +893,8 @@
               text = element_text(size=30, face="bold"),
               legend.box ='horizontal')
       PCbox_ile_symb
+      
+      write.table(file = paste0(outputPrefix,"_FigureS5d_Data.tab"), gg_ile_symb, quote = F, sep = '\t', row.names = F)
       
       plot_dapc_ile_symb <- ggplot() +
         stat_ellipse(data=gg_ile_symb, geom="polygon", aes(x=LD1,y=LD2,color=Ile, fill=Ile), 
@@ -928,93 +946,6 @@
       png(file = paste0(outputPrefix, "_Symbiont_Ile.png"),  w = 20, h=20, units="in", res=300)
       plot_dapc_ile_symb
       dev.off()
-    
-    ##### Symbiont DAPC Plots #####
-      
-      dapc_ile_symb_DFeig <- data.frame("DF" = seq(from=1, to=length(SymDAPC_ile$eig), by=1),
-                                   "DFeigval" = SymDAPC_ile$eig,
-                                   "DFkept" = c(rep("Kept",2),rep("Not",length(SymDAPC_ile$eig)-2)))
-      dapc_ile_symb_PCeig <- data.frame("PC" = seq(from=1, to=length(SymDAPC_ile$pca.eig), by=1),
-                                 "PCcumvar" = 100 * cumsum(SymDAPC_ile$pca.eig)/sum(SymDAPC_ile$pca.eig),
-                                 "PCkept" = c(rep("Kept",SymDAPC_ile$n.pca),rep("Not",length(SymDAPC_ile$pca.eig)-SymDAPC_ile$n.pca)))
-
-      DFbox_ile_symb <- ggplot() +
-        geom_bar(data = dapc_ile_symb_DFeig, aes(x=DF,y=DFeigval, fill=DFkept),
-                 stat="identity", color = "black", show.legend = F) +
-        scale_x_continuous(limits = c(0.5,length(SymDAPC_ile$eig)+0.5), breaks = seq(from=1, to=length(SymDAPC_ile$eig), by=1)) +
-        scale_fill_manual(values=c("grey30","white")) +
-        xlab("Discriminant Function") +
-        ylab("DF eigenvalues") +
-        theme_bw() +
-        theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-              panel.background = element_blank(), axis.line = element_line(colour = "black"),
-              text = element_text(size=30, face="bold"),
-              legend.box ='horizontal')
-      DFbox_ile_symb
-      
-      PCbox_ile_symb <- ggplot() +
-        geom_bar(data = dapc_ile_symb_PCeig, aes(x=PC,y=PCcumvar, fill=PCkept),
-                 stat="identity", color = "black", show.legend = F) +
-        scale_x_continuous(limits = c(0,length(SymDAPC_ile$pca.eig)+0.5), breaks = seq(from=0, to=length(SymDAPC_ile$pca.eig), by=20)) +
-        scale_fill_manual(values=c("grey30","white")) +
-        xlab("PCA Axis") +
-        ylab("Cumulative Variance Explained (%)") +
-        theme_bw() +
-        theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-              panel.background = element_blank(), axis.line = element_line(colour = "black"),
-              text = element_text(size=30, face="bold"),
-              legend.box ='horizontal')
-      PCbox_ile_symb
-
-      plot_dapc_ile_symb <- ggplot() +
-        stat_ellipse(data=gg_ile_symb, geom="polygon", aes(x=LD1,y=LD2,color=Ile, fill=Ile),
-                     type="t", level=0.95, alpha=0.5, show.legend=F,) +
-        geom_segment(data=gg_ile_symb, show.legend=F,
-                     aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Ile)) +
-        annotate(geom="text", x=-35, y=10,
-                 label=paste("Proportion Reassigned /n", VarExp_Sym_mean_ile,  " ? ", VarExp_Sym_sd_ile, sep =' '),
-                 color="black", size = 14) +
-        scale_color_manual(values=mycols,
-                           name = "Island",
-                           labels = c("Las Perlas", "Coiba", "Malpelo",
-                                     "Rapa Nui", "Ducie", "Gambier",
-                                     "Moorea","Aitutaki","Niue","Upolu","Guam")) +
-        scale_fill_manual(values=mycols,
-                          name = "Island",
-                          labels = c("Las Perlas", "Coiba", "Malpelo",
-                                     "Rapa Nui", "Ducie", "Gambier",
-                                     "Moorea","Aitutaki","Niue","Upolu","Guam")) +
-        new_scale("fill") +
-        geom_point(data=gg_ile_symb, aes(x=LD1,y=LD2,fill=Ile), color="black",
-                   size=10, pch=21) +
-        scale_fill_manual(values=mycols,
-                          name = "Island",
-                          labels = c("Las Perlas", "Coiba", "Malpelo",
-                                     "Rapa Nui", "Ducie", "Gambier",
-                                     "Moorea","Aitutaki","Niue","Upolu","Guam")) +
-        new_scale("fill") +
-        geom_text_repel(data=centroids_ile_symb, aes(x=LD1, y=LD2, label=Label),
-                         alpha=0.5, color="black", size=20, show.legend = FALSE) +
-        scale_fill_manual(values=mycols_symclade[c(3:7)],
-                          name = "Cladocopium Group",
-                          labels = c("L1", "L2", "L3",
-                                     "L4", "L5")) +
-        xlab("Discriminant Function 1") +
-        ylab("Discriminant Function 2") +
-        theme_bw() +
-        theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-              panel.background = element_blank(), axis.line = element_line(colour = "black"),
-              text = element_text(size=40, face="bold"),
-              legend.box ='horizontal', legend.position = "top")
-      plot_dapc_ile_symb
-
-      pdf(file = paste0(outputPrefix, "_Symbiont_Ile.pdf"), w = 20, h =20)
-      plot_dapc_ile_symb
-      dev.off()
-
-      png(file = paste0(outputPrefix, "_Symbiont_Ile.png"),  w = 20, h =20, units="in", res=300)
-      plot_dapc_ile_symb
-      dev.off()
       
       dapc_clade_symb_DFeig <- data.frame("DF" = seq(from=1, to=length(SymDAPC_clade$eig), by=1),
                                    "DFeigval" = SymDAPC_clade$eig,
@@ -1023,6 +954,8 @@
                                  "PCcumvar" = 100 * cumsum(SymDAPC_clade$pca.eig)/sum(SymDAPC_clade$pca.eig),
                                  "PCkept" = c(rep("Kept",SymDAPC_clade$n.pca),rep("Not",length(SymDAPC_clade$pca.eig)-SymDAPC_clade$n.pca)))
 
+      write.table(file = paste0(outputPrefix,"_FigureS4g_Data.tab"), dapc_clade_symb_DFeig, quote = F, sep = '\t', row.names = F)
+      
       DFbox_clade_symb <- ggplot() +
         geom_bar(data = dapc_clade_symb_DFeig, aes(x=DF,y=DFeigval, fill=DFkept),
                  stat="identity", color = "black", show.legend = F) +
@@ -1050,6 +983,8 @@
               text = element_text(size=30, face="bold"),
               legend.box ='horizontal')
       PCbox_clade_symb
+      
+      write.table(file = paste0(outputPrefix,"_FigureS5c_Data.tab"), gg_clade_symb, quote = F, sep = '\t', row.names = F)
 
       plot_dapc_clade_symb <- ggplot() +
         stat_ellipse(data=gg_clade_symb, geom="polygon", aes(x=LD1,y=LD2,color=Clade, fill=Clade),
@@ -1106,6 +1041,8 @@
                                  "PCcumvar" = 100 * cumsum(SymDAPC_symclade$pca.eig)/sum(SymDAPC_symclade$pca.eig),
                                  "PCkept" = c(rep("Kept",SymDAPC_symclade$n.pca),rep("Not",length(SymDAPC_symclade$pca.eig)-SymDAPC_symclade$n.pca)))
 
+      write.table(file = paste0(outputPrefix,"_FigureS4h_Data.tab"), dapc_symclade_symb_DFeig, quote = F, sep = '\t', row.names = F)
+      
       DFbox_symclade_symb <- ggplot() +
         geom_bar(data = dapc_symclade_symb_DFeig, aes(x=DF,y=DFeigval, fill=DFkept),
                  stat="identity", color = "black", show.legend = F) +
@@ -1133,6 +1070,8 @@
               text = element_text(size=30, face="bold"),
               legend.box ='horizontal')
       PCbox_symclade_symb
+      
+      write.table(file = paste0(outputPrefix,"_FigureS5b_Data.tab"), gg_symclade_symb, quote = F, sep = '\t', row.names = F)
 
       plot_dapc_symclade_symb <- ggplot() +
         stat_ellipse(data=gg_symclade_symb, geom="polygon", aes(x=LD1,y=LD2,color=SymClade, fill=SymClade),
@@ -1329,6 +1268,8 @@
     EnrichTab2$Loading <- "Discriminant Function 2"
     
     EnrichTab <- rbind(EnrichTab1, EnrichTab2)
+    
+    write.table(file = paste0(outputPrefix,"_Figure4c_Data.tab"), EnrichTab, quote = F, sep = '\t', row.names = F)
     
   # Step 2 - Create function to make Dotplot of top 100 (showCategory = 100) enriched Biological Process categories
     dotplot_goseq <- function(df, showCategory=10000){
