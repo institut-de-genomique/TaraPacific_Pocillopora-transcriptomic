@@ -7,20 +7,10 @@ To produce Figure 5 of the article, the following files are required: <br>
 -the historical and in situ environmental data: TaraPacific_Nutrents_SST_timeseries_mean_products-20220317_11Islands.xlsx in this directory <br>
 <br>
 ```r
-## TARA Pacific Project - Pocillopora Holobiont MetaT Analyses ##
-#################################################################
-
-# Author: ARMSTRONG Eric
-# Created: 21 August 2018
-# Last Edited: 9 December 2022
-
 ## 1. INITIALIZATION ------------------------------------------------------------------------------------------------------------------------------------
 
   # Step 1 - Set Defaults
 
-    # Set working directory
-      setwd("C:/Users/uax75/OneDrive/Documents/R/TaraCoral_2020/Final_Results/Pocillopora/ManuscriptDocs/Scripts/Figure5_CCA/")
-    
     # Set the prefix for each output file name
       outputPrefix <- "TaraPacific_Holobiont_CCA_GitHub_2022-12"
 
