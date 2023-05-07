@@ -5,9 +5,9 @@
   
 ## Phylogeny of Tara Pocillopora mtORF with Johnston et al 2022 sequences
 
-Johnston et al 2022 https://doi.org/10.1007/s00338-021-02107-9 
-Accession IDs and Taxonomy: Sample-haplotype_johnston2022_NicheDifferences.tab (675 sequences including 8a and 11) 
-Sequences : mtORF_johnston2022.fa 
+Johnston et al 2022 https://doi.org/10.1007/s00338-021-02107-9  
+Accession IDs and Taxonomy: Sample-haplotype_johnston2022_NicheDifferences.tab (675 sequences including 8a and 11)  
+Sequences : mtORF_johnston2022.fa  
 
 Fasta modification to add sequences names of Johnston et al 2017
 ```bash
@@ -25,9 +25,9 @@ Multiple alignment with mafft v 7.490.
 mafft TP-Johnston_NichesDifferences_mtORF-Pocillo.fa > TP-Johnston_NichesDifferences_mtORF-Pocillo.mafft
 ```
 
-Neighbor-joining phylogeny with Mega version 10.1.5. 
-Default parameters and 100 bootstrap 
-File export in newick : TP-Johnston_mtORF-Pocillo.mafft.ML.nwk 
+Neighbor-joining phylogeny with Mega version 10.1.5.  
+Default parameters and 100 bootstrap  
+File export in newick : TP-Johnston_mtORF-Pocillo.mafft.ML.nwk  
 
 ## mtORF Phylogeny representation in R
 
@@ -52,7 +52,7 @@ mtORFTree$tip.label<-sub("-johnston","",mtORFTree$tip.label)
 mtORFTree$tip.label<-sub("POC","",mtORFTree$tip.label)
 
 #Plot the figure.
-pdf(file="mtORF_MLtree_TP-Johnston.pdf",width=11,height = 11)
+pdf(file="mtORF_NJtree_TP-Johnston.pdf",width=11,height = 11)
 ggtree(mtORFTree,aes(x,y),layout="circular",branch.length = "none")+
   geom_tippoint(aes(color=group),size=3)+
   geom_tiplab2(size=3,hjust=-0.05)+
