@@ -14,9 +14,9 @@ To produce Figure 4 of the article, the following files are required:
 ## 1. INITIALIZATION ------------------------------------------------------------------------------------------------------------------------------------
 
   # Step 1 - Set Defaults
-
+  
     # Set the prefix for each output file name
-      outputPrefix <- "TaraPacific_Pocillopora_DAPC_2022-11"
+      outputPrefix <- "TaraPacific_Pocillopora_DAPC_GitHub_2022-11"
     
 ## 2. LOAD DATA & METADATA -------------------------------------------------------------------------------------------------------------------------------
 
@@ -333,17 +333,19 @@ To produce Figure 4 of the article, the following files are required:
     Host_DiscrimGenes$Model <- "Pocillopora"
     Both_DiscrimGenes <- rbind(Host_DiscrimGenes, Symb_DiscrimGenes)
     
+    write.table(file = paste0(outputPrefix,"_Figure4a_Data.tab"), Both_DiscrimGenes, quote = F, sep = '\t', row.names = F)
+    
     discrim_Host_violplot <- ggplot() +
       geom_violin(data=subset(Both_DiscrimGenes, Model %in% c("Pocillopora")), aes(x = Group2, y = LDScore*1000, fill = Group2)) +
       annotate(geom = "text", x = 1, y = 0.015, label = "4,386 genes", size = 10) +
       annotate(geom = "text", x = 2, y = 0.015, label = "1,396 genes", size = 10) +
-      annotate(geom = "text", x = 2, y = 0.01, label = "687 host-dependent\n 709 symbiont-dependent", size = 6) +
+      annotate(geom = "text", x = 2, y = 0.01, label = "687 host-dependent/n 709 symbiont-dependent", size = 6) +
       scale_fill_manual(values=c("#66C2A5","#8a128a")) +
       coord_trans(y = "log10") +
       #scale_y_log10() + 
       #scale_y_continuous(trans='log10') +
       scale_y_continuous(limits = c(0.01,10), breaks = c(0,0.03,0.3,1,3,6,9)) +
-      scale_x_discrete(breaks=c("Ile","Lineage"), labels=c("Environment", "Lineage\n(Host + Photosymbiont)")) +
+      scale_x_discrete(breaks=c("Ile","Lineage"), labels=c("Environment", "Lineage/n(Host + Photosymbiont)")) +
       #facet_wrap(~Model) +
       xlab("Variables") +
       #ylab("Loading Score") +
@@ -367,13 +369,13 @@ To produce Figure 4 of the article, the following files are required:
       geom_violin(data=subset(Both_DiscrimGenes, Model %in% c("Symbiont")), aes(x = Group2, y = LDScore*1000, fill = Group2)) +
       annotate(geom = "text", x = 1, y = 0.015, label = "2,495 genes", size = 10) +
       annotate(geom = "text", x = 2, y = 0.015, label = "2,041 genes", size = 10) +
-      annotate(geom = "text", x = 2, y = 0.01, label = "1,544 host-dependet genes\n 497 symbiont-dependent genes", size = 6) +
+      annotate(geom = "text", x = 2, y = 0.01, label = "1,544 host-dependet genes/n 497 symbiont-dependent genes", size = 6) +
       scale_fill_manual(values=c("#66C2A5","#8a128a")) +
       coord_trans(y = "log10") +
       #scale_y_log10() + 
       #scale_y_continuous(trans='log10') +
       scale_y_continuous(limits = c(0.01,10), breaks = c(0,0.03,0.3,1,3,6,9)) +
-      scale_x_discrete(breaks=c("Ile","Lineage"), labels=c("Environment", "Lineage\n(Symbiont + Photosymbiont)")) +
+      scale_x_discrete(breaks=c("Ile","Lineage"), labels=c("Environment", "Lineage/n(Symbiont + Photosymbiont)")) +
       #facet_wrap(~Model) +
       xlab("Variables") +
       #ylab("Loading Score") +
@@ -557,6 +559,9 @@ To produce Figure 4 of the article, the following files are required:
       dapc_ile_PCeig <- data.frame("PC" = seq(from=1, to=length(HostDAPC_ile$pca.eig), by=1),
                                  "PCcumvar" = 100 * cumsum(HostDAPC_ile$pca.eig)/sum(HostDAPC_ile$pca.eig),
                                  "PCkept" = c(rep("Kept",HostDAPC_ile$n.pca),rep("Not",length(HostDAPC_ile$pca.eig)-HostDAPC_ile$n.pca)))
+      
+      write.table(file = paste0(outputPrefix,"_FigureS4a_Data.tab"), dapc_ile_PCeig, quote = F, sep = '\t', row.names = F)
+      write.table(file = paste0(outputPrefix,"_FigureS4b_Data.tab"), dapc_ile_DFeig, quote = F, sep = '\t', row.names = F)
   
       DFbox_ile <- ggplot() +
         geom_bar(data = dapc_ile_DFeig, aes(x=DF,y=DFeigval, fill=DFkept), 
@@ -586,6 +591,8 @@ To produce Figure 4 of the article, the following files are required:
               legend.box ='horizontal')
       PCbox_ile
       
+      write.table(file = paste0(outputPrefix,"_Figure4b_Data.tab"), gg_ile, quote = F, sep = '\t', row.names = F)
+      
       options(ggrepel.max.overlaps = Inf)
       plot_dapc_ile <- ggplot() +
         stat_ellipse(data=gg_ile, geom="polygon", aes(x=LD1,y=LD2,color=Ile, fill=TSA_hist), 
@@ -593,7 +600,7 @@ To produce Figure 4 of the article, the following files are required:
         geom_segment(data=gg_ile, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Ile)) +
         annotate(geom="text", x=7, y=-10, 
-                 label=paste("Proportion Reassigned \n", VarExp_Host_mean_ile, "?", VarExp_Host_sd_ile, sep=' '),
+                 label=paste("Proportion Reassigned /n", VarExp_Host_mean_ile, "?", VarExp_Host_sd_ile, sep=' '),
                  color="black", size = 14) +
         scale_fill_distiller(palette = "RdBu") +
         scale_color_manual(values=mycols,
@@ -669,7 +676,9 @@ To produce Figure 4 of the article, the following files are required:
       plot_HostDAPC_ile_DF2_TSAfill
       dev.off()
       
-        
+      
+      write.table(file = paste0(outputPrefix,"_FigureS4c_Data.tab"), dapc_clade_DFeig, quote = F, sep = '\t', row.names = F)
+      
       dapc_clade_DFeig <- data.frame("DF" = seq(from=1, to=length(HostDAPC_clade$eig), by=1),
                                    "DFeigval" = HostDAPC_clade$eig,
                                    "DFkept" = c(rep("Kept",2),rep("Not",length(HostDAPC_clade$eig)-2)))
@@ -705,6 +714,7 @@ To produce Figure 4 of the article, the following files are required:
               legend.box ='horizontal')
       PCbox_clade
       
+      write.table(file = paste0(outputPrefix,"_FigureS6b_Data.tab"), gg_clade, quote = F, sep = '\t', row.names = F)
       
       plot_dapc_clade <- ggplot() +
         stat_ellipse(data=gg_clade, geom="polygon", aes(x=LD1,y=LD2,color=Clade, fill=Clade), 
@@ -712,7 +722,7 @@ To produce Figure 4 of the article, the following files are required:
         geom_segment(data=gg_clade, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Clade)) +
         annotate(geom="text", x=-27.5, y=-16,
-                 label=paste("Proportion Reassigned \n", VarExp_Host_mean_clade, "?", VarExp_Host_sd_clade, sep=' '),
+                 label=paste("Proportion Reassigned /n", VarExp_Host_mean_clade, "?", VarExp_Host_sd_clade, sep=' '),
                  color="black", size = 14) +
         scale_color_manual(values=mycols_clade,
                            name = "SVD Clade",
@@ -756,6 +766,7 @@ To produce Figure 4 of the article, the following files are required:
       plot_dapc_clade
       dev.off()
       
+      write.table(file = paste0(outputPrefix,"_FigureS4d_Data.tab"), dapc_symclade_DFeig, quote = F, sep = '\t', row.names = F)
       
       dapc_symclade_DFeig <- data.frame("DF" = seq(from=1, to=length(HostDAPC_symclade$eig), by=1),
                                    "DFeigval" = HostDAPC_symclade$eig,
@@ -792,6 +803,7 @@ To produce Figure 4 of the article, the following files are required:
               legend.box ='horizontal')
       PCbox_symclade
       
+      write.table(file = paste0(outputPrefix,"_FigureS7b_Data.tab"), gg_symclade, quote = F, sep = '\t', row.names = F)
       
       plot_dapc_symclade <- ggplot() +
         stat_ellipse(data=gg_symclade, geom="polygon", aes(x=LD1,y=LD2,color=Clade, fill=Clade), 
@@ -799,7 +811,7 @@ To produce Figure 4 of the article, the following files are required:
         geom_segment(data=gg_symclade, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Clade)) +
         annotate(geom="text", x=8, y=-16,
-                 label=paste("Proportion Reassigned \n", VarExp_Host_mean_symclade, "?", VarExp_Host_sd_symclade, sep=' '),
+                 label=paste("Proportion Reassigned /n", VarExp_Host_mean_symclade, "?", VarExp_Host_sd_symclade, sep=' '),
                  color="black", size = 14) +
         scale_color_manual(values=mycols_symclade[c(3:7)],
                              name = "Cladocopium Lineage",
@@ -840,8 +852,9 @@ To produce Figure 4 of the article, the following files are required:
       png(file = paste0(outputPrefix, "_Host_SymClade.png"),  w = 20, h=20, units="in", res=300)
       plot_dapc_symclade
       dev.off()
-        
-        
+    
+    ##### Symbiont DAPC Plots #####
+      
       dapc_ile_symb_DFeig <- data.frame("DF" = seq(from=1, to=length(SymDAPC_ile$eig), by=1),
                                    "DFeigval" = SymDAPC_ile$eig,
                                    "DFkept" = c(rep("Kept",2),rep("Not",length(SymDAPC_ile$eig)-2)))
@@ -849,6 +862,9 @@ To produce Figure 4 of the article, the following files are required:
                                  "PCcumvar" = 100 * cumsum(SymDAPC_ile$pca.eig)/sum(SymDAPC_ile$pca.eig),
                                  "PCkept" = c(rep("Kept",SymDAPC_ile$n.pca),rep("Not",length(SymDAPC_ile$pca.eig)-SymDAPC_ile$n.pca)))
   
+      write.table(file = paste0(outputPrefix,"_FigureS4e_Data.tab"), dapc_ile_symb_PCeig, quote = F, sep = '\t', row.names = F)
+      write.table(file = paste0(outputPrefix,"_FigureS4f_Data.tab"), dapc_ile_symb_DFeig, quote = F, sep = '\t', row.names = F)
+      
       DFbox_ile_symb <- ggplot() +
         geom_bar(data = dapc_ile_symb_DFeig, aes(x=DF,y=DFeigval, fill=DFkept), 
                  stat="identity", color = "black", show.legend = F) +
@@ -877,13 +893,15 @@ To produce Figure 4 of the article, the following files are required:
               legend.box ='horizontal')
       PCbox_ile_symb
       
+      write.table(file = paste0(outputPrefix,"_FigureS5d_Data.tab"), gg_ile_symb, quote = F, sep = '\t', row.names = F)
+      
       plot_dapc_ile_symb <- ggplot() +
         stat_ellipse(data=gg_ile_symb, geom="polygon", aes(x=LD1,y=LD2,color=Ile, fill=Ile), 
                      type="t", level=0.95, alpha=0.5, show.legend=F,) +
         geom_segment(data=gg_ile_symb, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Ile)) +
         annotate(geom="text", x=70, y=10,
-                 label=paste("Proportion Reassigned \n", VarExp_Sym_mean_ile, "?", VarExp_Sym_sd_ile, sep=' '),
+                 label=paste("Proportion Reassigned /n", VarExp_Sym_mean_ile, "?", VarExp_Sym_sd_ile, sep=' '),
                  color="black", size = 14) +
         scale_color_manual(values=mycols,
                            name = "Island",
@@ -927,93 +945,6 @@ To produce Figure 4 of the article, the following files are required:
       png(file = paste0(outputPrefix, "_Symbiont_Ile.png"),  w = 20, h=20, units="in", res=300)
       plot_dapc_ile_symb
       dev.off()
-    
-    ##### Symbiont DAPC Plots #####
-      
-      dapc_ile_symb_DFeig <- data.frame("DF" = seq(from=1, to=length(SymDAPC_ile$eig), by=1),
-                                   "DFeigval" = SymDAPC_ile$eig,
-                                   "DFkept" = c(rep("Kept",2),rep("Not",length(SymDAPC_ile$eig)-2)))
-      dapc_ile_symb_PCeig <- data.frame("PC" = seq(from=1, to=length(SymDAPC_ile$pca.eig), by=1),
-                                 "PCcumvar" = 100 * cumsum(SymDAPC_ile$pca.eig)/sum(SymDAPC_ile$pca.eig),
-                                 "PCkept" = c(rep("Kept",SymDAPC_ile$n.pca),rep("Not",length(SymDAPC_ile$pca.eig)-SymDAPC_ile$n.pca)))
-
-      DFbox_ile_symb <- ggplot() +
-        geom_bar(data = dapc_ile_symb_DFeig, aes(x=DF,y=DFeigval, fill=DFkept),
-                 stat="identity", color = "black", show.legend = F) +
-        scale_x_continuous(limits = c(0.5,length(SymDAPC_ile$eig)+0.5), breaks = seq(from=1, to=length(SymDAPC_ile$eig), by=1)) +
-        scale_fill_manual(values=c("grey30","white")) +
-        xlab("Discriminant Function") +
-        ylab("DF eigenvalues") +
-        theme_bw() +
-        theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-              panel.background = element_blank(), axis.line = element_line(colour = "black"),
-              text = element_text(size=30, face="bold"),
-              legend.box ='horizontal')
-      DFbox_ile_symb
-      
-      PCbox_ile_symb <- ggplot() +
-        geom_bar(data = dapc_ile_symb_PCeig, aes(x=PC,y=PCcumvar, fill=PCkept),
-                 stat="identity", color = "black", show.legend = F) +
-        scale_x_continuous(limits = c(0,length(SymDAPC_ile$pca.eig)+0.5), breaks = seq(from=0, to=length(SymDAPC_ile$pca.eig), by=20)) +
-        scale_fill_manual(values=c("grey30","white")) +
-        xlab("PCA Axis") +
-        ylab("Cumulative Variance Explained (%)") +
-        theme_bw() +
-        theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-              panel.background = element_blank(), axis.line = element_line(colour = "black"),
-              text = element_text(size=30, face="bold"),
-              legend.box ='horizontal')
-      PCbox_ile_symb
-
-      plot_dapc_ile_symb <- ggplot() +
-        stat_ellipse(data=gg_ile_symb, geom="polygon", aes(x=LD1,y=LD2,color=Ile, fill=Ile),
-                     type="t", level=0.95, alpha=0.5, show.legend=F,) +
-        geom_segment(data=gg_ile_symb, show.legend=F,
-                     aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Ile)) +
-        annotate(geom="text", x=-35, y=10,
-                 label=paste("Proportion Reassigned \n", VarExp_Sym_mean_ile,  " ? ", VarExp_Sym_sd_ile, sep =' '),
-                 color="black", size = 14) +
-        scale_color_manual(values=mycols,
-                           name = "Island",
-                           labels = c("Las Perlas", "Coiba", "Malpelo",
-                                     "Rapa Nui", "Ducie", "Gambier",
-                                     "Moorea","Aitutaki","Niue","Upolu","Guam")) +
-        scale_fill_manual(values=mycols,
-                          name = "Island",
-                          labels = c("Las Perlas", "Coiba", "Malpelo",
-                                     "Rapa Nui", "Ducie", "Gambier",
-                                     "Moorea","Aitutaki","Niue","Upolu","Guam")) +
-        new_scale("fill") +
-        geom_point(data=gg_ile_symb, aes(x=LD1,y=LD2,fill=Ile), color="black",
-                   size=10, pch=21) +
-        scale_fill_manual(values=mycols,
-                          name = "Island",
-                          labels = c("Las Perlas", "Coiba", "Malpelo",
-                                     "Rapa Nui", "Ducie", "Gambier",
-                                     "Moorea","Aitutaki","Niue","Upolu","Guam")) +
-        new_scale("fill") +
-        geom_text_repel(data=centroids_ile_symb, aes(x=LD1, y=LD2, label=Label),
-                         alpha=0.5, color="black", size=20, show.legend = FALSE) +
-        scale_fill_manual(values=mycols_symclade[c(3:7)],
-                          name = "Cladocopium Group",
-                          labels = c("L1", "L2", "L3",
-                                     "L4", "L5")) +
-        xlab("Discriminant Function 1") +
-        ylab("Discriminant Function 2") +
-        theme_bw() +
-        theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-              panel.background = element_blank(), axis.line = element_line(colour = "black"),
-              text = element_text(size=40, face="bold"),
-              legend.box ='horizontal', legend.position = "top")
-      plot_dapc_ile_symb
-
-      pdf(file = paste0(outputPrefix, "_Symbiont_Ile.pdf"), w = 20, h =20)
-      plot_dapc_ile_symb
-      dev.off()
-
-      png(file = paste0(outputPrefix, "_Symbiont_Ile.png"),  w = 20, h =20, units="in", res=300)
-      plot_dapc_ile_symb
-      dev.off()
       
       dapc_clade_symb_DFeig <- data.frame("DF" = seq(from=1, to=length(SymDAPC_clade$eig), by=1),
                                    "DFeigval" = SymDAPC_clade$eig,
@@ -1022,6 +953,8 @@ To produce Figure 4 of the article, the following files are required:
                                  "PCcumvar" = 100 * cumsum(SymDAPC_clade$pca.eig)/sum(SymDAPC_clade$pca.eig),
                                  "PCkept" = c(rep("Kept",SymDAPC_clade$n.pca),rep("Not",length(SymDAPC_clade$pca.eig)-SymDAPC_clade$n.pca)))
 
+      write.table(file = paste0(outputPrefix,"_FigureS4g_Data.tab"), dapc_clade_symb_DFeig, quote = F, sep = '\t', row.names = F)
+      
       DFbox_clade_symb <- ggplot() +
         geom_bar(data = dapc_clade_symb_DFeig, aes(x=DF,y=DFeigval, fill=DFkept),
                  stat="identity", color = "black", show.legend = F) +
@@ -1049,6 +982,8 @@ To produce Figure 4 of the article, the following files are required:
               text = element_text(size=30, face="bold"),
               legend.box ='horizontal')
       PCbox_clade_symb
+      
+      write.table(file = paste0(outputPrefix,"_FigureS5c_Data.tab"), gg_clade_symb, quote = F, sep = '\t', row.names = F)
 
       plot_dapc_clade_symb <- ggplot() +
         stat_ellipse(data=gg_clade_symb, geom="polygon", aes(x=LD1,y=LD2,color=Clade, fill=Clade),
@@ -1056,7 +991,7 @@ To produce Figure 4 of the article, the following files are required:
         geom_segment(data=gg_clade_symb, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=Clade)) +
         annotate(geom="text", x=-35, y=10,
-                 label=paste("Proportion Reassigned \n", VarExp_Sym_mean_clade,  " ? ", VarExp_Sym_sd_clade, sep =' '),
+                 label=paste("Proportion Reassigned /n", VarExp_Sym_mean_clade,  " ? ", VarExp_Sym_sd_clade, sep =' '),
                  color="black", size = 14) +
         scale_color_manual(values=mycols_clade,
                            name = "SVD Clade",
@@ -1105,6 +1040,8 @@ To produce Figure 4 of the article, the following files are required:
                                  "PCcumvar" = 100 * cumsum(SymDAPC_symclade$pca.eig)/sum(SymDAPC_symclade$pca.eig),
                                  "PCkept" = c(rep("Kept",SymDAPC_symclade$n.pca),rep("Not",length(SymDAPC_symclade$pca.eig)-SymDAPC_symclade$n.pca)))
 
+      write.table(file = paste0(outputPrefix,"_FigureS4h_Data.tab"), dapc_symclade_symb_DFeig, quote = F, sep = '\t', row.names = F)
+      
       DFbox_symclade_symb <- ggplot() +
         geom_bar(data = dapc_symclade_symb_DFeig, aes(x=DF,y=DFeigval, fill=DFkept),
                  stat="identity", color = "black", show.legend = F) +
@@ -1132,6 +1069,8 @@ To produce Figure 4 of the article, the following files are required:
               text = element_text(size=30, face="bold"),
               legend.box ='horizontal')
       PCbox_symclade_symb
+      
+      write.table(file = paste0(outputPrefix,"_FigureS5b_Data.tab"), gg_symclade_symb, quote = F, sep = '\t', row.names = F)
 
       plot_dapc_symclade_symb <- ggplot() +
         stat_ellipse(data=gg_symclade_symb, geom="polygon", aes(x=LD1,y=LD2,color=SymClade, fill=SymClade),
@@ -1139,7 +1078,7 @@ To produce Figure 4 of the article, the following files are required:
         geom_segment(data=gg_symclade_symb, show.legend=F,
                      aes(x=LD1.centroid, y=LD2.centroid, xend=LD1, yend=LD2, color=SymClade)) +
         annotate(geom="text", x=-35, y=10,
-                 label=paste("Proportion Reassigned \n", VarExp_Sym_mean_symclade,  " ? ", VarExp_Sym_sd_symclade, sep =' '),
+                 label=paste("Proportion Reassigned /n", VarExp_Sym_mean_symclade,  " ? ", VarExp_Sym_sd_symclade, sep =' '),
                  color="black", size = 14) +
         scale_color_manual(values=mycols_symclade[c(3:7)],
                            name = "Cladocopium Group",
@@ -1200,7 +1139,7 @@ To produce Figure 4 of the article, the following files are required:
     detach("package:xlsx", unload=T)
     library(openxlsx)
     
-    GO_dat <- read.xlsx("Pocillopora_meandrina_v3.2_annot.xlsx", sheet = "Poc_v3.2_annot.ipr", rowNames = F, colNames = F)
+    GO_dat <- read.xlsx("../Pocillopora_meandrina_v3.2_annot.xlsx", sheet = "Poc_v3.2_annot.ipr", rowNames = F, colNames = F)
       
     library(plyr)
     GO_dat <- ddply(GO_dat, .(X1), summarise,
@@ -1311,15 +1250,28 @@ To produce Figure 4 of the article, the following files are required:
     library(ggplot2)
       
   # Step 1 - Select the GOSeq results of interest and create an input table for dotplot
-    GOSeqfile <- "Pocillopora_DAPC_SymClade_LD2_GOseq.enriched.txt" #Replace with your GO Enrichment Results from above
-    EnrichTab <- read.table(paste0("./DAPC_GOSeq/",GOSeqfile,sep=''),
+    GOSeqfile1 <- "Pocillopora_DAPC_Ile_LD1_GOseq.enriched.txt" #Replace with your GO Enrichment Results from above
+    EnrichTab1 <- read.table(paste0("./DAPC_GOSeq/",GOSeqfile1,sep=''),
                            header = TRUE, quote="\"",
                            sep=";")
-    EnrichTab$ratio <- EnrichTab$numDEInCat/EnrichTab$numInCat
-    EnrichTab$pval <- EnrichTab$over_represented_pvalue
+    EnrichTab1$ratio <- EnrichTab1$numDEInCat/EnrichTab1$numInCat
+    EnrichTab1$pval <- EnrichTab1$over_represented_pvalue
+    EnrichTab1$Loading <- "Discriminant  Function 1"
+    
+    GOSeqfile2 <- "Pocillopora_DAPC_Ile_LD2_GOseq.enriched.txt" #Replace with your GO Enrichment Results from above
+    EnrichTab2 <- read.table(paste0("./DAPC_GOSeq/",GOSeqfile2,sep=''),
+                           header = TRUE, quote="\"",
+                           sep=";")
+    EnrichTab2$ratio <- EnrichTab2$numDEInCat/EnrichTab2$numInCat
+    EnrichTab2$pval <- EnrichTab2$over_represented_pvalue
+    EnrichTab2$Loading <- "Discriminant Function 2"
+    
+    EnrichTab <- rbind(EnrichTab1, EnrichTab2)
+    
+    write.table(file = paste0(outputPrefix,"_Figure4c_Data.tab"), EnrichTab, quote = F, sep = '\t', row.names = F)
     
   # Step 2 - Create function to make Dotplot of top 100 (showCategory = 100) enriched Biological Process categories
-    dotplot_goseq <- function(df, showCategory=100){
+    dotplot_goseq <- function(df, showCategory=10000){
       df <- df[with(df, order(ratio, pval, decreasing = c(TRUE, FALSE))),]
       df <- head(df, n=showCategory)
       d_plot <- ggplot(subset(df, ontology %in% c("BP")), aes_string(x="term", 
@@ -1332,15 +1284,16 @@ To produce Figure 4 of the article, the following files are required:
                             high="#FFF94C",
                             name = "p-value") +
         scale_size_continuous(range = c(5, 10)) +
-        facet_grid(ontology~.,
+        facet_grid(.~Loading,
                    drop = TRUE,
-                   scales = "free_y") +
+                   scales = "free_x") +
         xlab("") +
         ylab("Count Ratio") +
         scale_x_discrete(expand = c(0.01, 0.2)) +
-        coord_flip() +
+        #coord_flip() +
         theme_bw(base_size=9) + 
-        theme(text = element_text(size = 20, face = 'bold')) +
+        theme(text = element_text(size = 40, face = 'bold'),
+              axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
         guides(size = guide_legend(title="DEGs", order = 1))
     }
     
@@ -1351,11 +1304,21 @@ To produce Figure 4 of the article, the following files are required:
     
     library(stringr)
     
-    pdf(file = paste0(outputPrefix, "_", substr(paste0(GOSeqfile),1,nchar(paste0(GOSeqfile))-4),"_Dotplot.pdf", sep=''), h = 8.5, w = 20)
+    # pdf(file = paste0(outputPrefix, "_", substr(paste0(GOSeqfile),1,nchar(paste0(GOSeqfile))-4),"_Dotplot.pdf", sep=''), h = 8.5, w = 20)
+    # plotDot
+    # dev.off()
+    # 
+    # png(file = paste0(outputPrefix, "_", substr(paste0(GOSeqfile),1,nchar(paste0(GOSeqfile))-4), "_Dotplot.png", sep=''), h = 8.5, w = 20, units = "in", res = 300)
+    # plotDot
+    # dev.off()
+    
+      # Step 3 - Plot results
+
+    pdf(file = paste0(outputPrefix,"_Host_Ile-LD1-LD2_Dotplot.pdf"), h = 20, w = 30)
     plotDot
     dev.off()
     
-    png(file = paste0(outputPrefix, "_", substr(paste0(GOSeqfile),1,nchar(paste0(GOSeqfile))-4), "_Dotplot.png", sep=''), h = 8.5, w = 20, units = "in", res = 300)
+    png(file = paste0(outputPrefix, "_Host_Ile-LD1-LD2_Dotplot.png"), h = 20, w = 30, units = "in", res = 300)
     plotDot
     dev.off()
     ```
