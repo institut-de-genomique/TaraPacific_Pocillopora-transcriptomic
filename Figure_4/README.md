@@ -14,7 +14,7 @@ To produce Figure 4 of the article, the following files are required:
 ## 1. INITIALIZATION ------------------------------------------------------------------------------------------------------------------------------------
 
   # Step 1 - Set Defaults
-  
+
     # Set the prefix for each output file name
       outputPrefix <- "TaraPacific_Pocillopora_DAPC_GitHub_2022-11"
     
@@ -677,8 +677,6 @@ To produce Figure 4 of the article, the following files are required:
       dev.off()
       
       
-      write.table(file = paste0(outputPrefix,"_FigureS4c_Data.tab"), dapc_clade_DFeig, quote = F, sep = '\t', row.names = F)
-      
       dapc_clade_DFeig <- data.frame("DF" = seq(from=1, to=length(HostDAPC_clade$eig), by=1),
                                    "DFeigval" = HostDAPC_clade$eig,
                                    "DFkept" = c(rep("Kept",2),rep("Not",length(HostDAPC_clade$eig)-2)))
@@ -686,6 +684,8 @@ To produce Figure 4 of the article, the following files are required:
                                  "PCcumvar" = 100 * cumsum(HostDAPC_clade$pca.eig)/sum(HostDAPC_clade$pca.eig),
                                  "PCkept" = c(rep("Kept", HostDAPC_clade$n.pca),rep("Not",length(HostDAPC_clade$pca.eig)-HostDAPC_clade$n.pca)))
   
+      write.table(file = paste0(outputPrefix,"_FigureS4c_Data.tab"), dapc_clade_DFeig, quote = F, sep = '\t', row.names = F)
+      
       DFbox_clade <- ggplot() +
         geom_bar(data = dapc_clade_DFeig, aes(x=DF,y=DFeigval, fill=DFkept), 
                  stat="identity", color = "black", show.legend = F) +
@@ -766,8 +766,6 @@ To produce Figure 4 of the article, the following files are required:
       plot_dapc_clade
       dev.off()
       
-      write.table(file = paste0(outputPrefix,"_FigureS4d_Data.tab"), dapc_symclade_DFeig, quote = F, sep = '\t', row.names = F)
-      
       dapc_symclade_DFeig <- data.frame("DF" = seq(from=1, to=length(HostDAPC_symclade$eig), by=1),
                                    "DFeigval" = HostDAPC_symclade$eig,
                                    "DFkept" = c(rep("Kept",2),rep("Not",length(HostDAPC_symclade$eig)-2)))
@@ -775,6 +773,8 @@ To produce Figure 4 of the article, the following files are required:
                                  "PCcumvar" = 100 * cumsum(HostDAPC_symclade$pca.eig)/sum(HostDAPC_symclade$pca.eig),
                                  "PCkept" = c(rep("Kept", HostDAPC_symclade$n.pca),rep("Not",length(HostDAPC_symclade$pca.eig)-HostDAPC_symclade$n.pca)))
   
+      write.table(file = paste0(outputPrefix,"_FigureS4d_Data.tab"), dapc_symclade_DFeig, quote = F, sep = '\t', row.names = F)
+      
       DFbox_symclade <- ggplot() +
         geom_bar(data = dapc_symclade_DFeig, aes(x=DF,y=DFeigval, fill=DFkept), 
                  stat="identity", color = "black", show.legend = F) +
