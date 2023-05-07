@@ -2,12 +2,11 @@
 <br>
 To produce Figure 1 of the article, the following files are required:
 <br>
--the associations between host, symbiont, and island: Variables11Islands.txt in this directory <br>
+-the associations between host, symbiont, and island: ITS2-Kmeans-clustering_Pocillopora_JL.xlsx in this directory <br>
 -raw gene expression for the host: Pocillopora_MetaT_ReadCount.tab available in this directory or at https://doi.org/10.5281/zenodo.6341761 <br>
--raw gene expression for the symbiont: CladocopiumC1_MetaT_ReadCount.tab in this directory or at https://doi.org/10.5281/zenodo.6341761 <br>
--the historical and in situ environmental data: TaraPacific_Nutrents_SST_timeseries_mean_products-20220317_11Islands.xlsx in this directory <br>
--the gene ontology annotations for the host genes: Pocillopora_meandrina_v3.2.annot.all.xlsx in this directory <br>
--the host gene lengths: Pocillopora_meandrina_v3.2.annot.all.xlsx in this directory <br>
+-the historical and in situ environmental data: TaraPacific_SST_timeseries_mean_products_mai2021.xlsx and TaraPacific_EnvironmentContext_condensed-20210618_preliminary_Barbara.xlsx in this directory <br>
+-the mean SST climatology data (1981 - 2010) from NOAA: X90.79.167.222.277.1.2.3.nc in this directory <br>
+-the proportion of Durusdinium in each colony: Pocillopora_Figures_2021-10_SymbiontClade_PropData_D.csv in this directory <br>
 <br>
 
 ```r
@@ -19,7 +18,7 @@ To produce Figure 1 of the article, the following files are required:
 ##### Load Count Data  #####
     
   # Step 1 - Load Pocillopora and Cladocopium raw count file with reads mapped to the predicted coding sequence
-    cts_raw_poc <- read.table("../WGCNA/Pocillopora_MetaT_ReadCount.tab", header=TRUE, com='', sep='\t', row.names=1, check.names=FALSE)
+    cts_raw_poc <- read.table("Pocillopora_MetaT_ReadCount.tab", header=TRUE, com='', sep='\t', row.names=1, check.names=FALSE)
     colnames(cts_raw_poc) <- gsub("C0","C",colnames(cts_raw_poc))
     
   # Step 2 - Merge Host and Symbiont read count dataframes by colony
@@ -33,7 +32,7 @@ To produce Figure 1 of the article, the following files are required:
     Site <- substr(Colony, 4, 6)
     
     library(xlsx)
-    CladeTable <- read.xlsx("../DiffExpress/ITS2-Kmeans-clustering_Pocillopora_JL.xlsx", sheetName = "RData", header = T)
+    CladeTable <- read.xlsx("ITS2-Kmeans-clustering_Pocillopora_JL.xlsx", sheetName = "RData", header = T)
     
     library(expss)
     Clade <- vlookup(Colony, CladeTable, result_column = "PocilloSVD", lookup_column = "Colony")
@@ -88,13 +87,13 @@ To produce Figure 1 of the article, the following files are required:
     library('xlsx')
     library('dplyr')
     
-    histData <- read.xlsx("../../../Environ_Data/GuillaumeData/TaraPacific_SST_timeseries_mean_products_mai2021.xlsx",
+    histData <- read.xlsx("TaraPacific_SST_timeseries_mean_products_mai2021.xlsx",
                          # sheetName = "TaraPacific_SST_timeseries_mean")
                          sheetName = "RData")
     # rownames(histData) <- histData$Colony
-    # currData <- read.xlsx("../../../Environ_Data/GuillaumeData/TaraPacific_EnvironmentContext_condensed-20210618_preliminary.xlsx",
+    # currData <- read.xlsx("TaraPacific_EnvironmentContext_condensed-20210618_preliminary.xlsx",
     #                      sheetName = "IleSiteData")
-    currData <- read.xlsx("../../../Environ_Data/GuillaumeData/TaraPacific_EnvironmentContext_condensed-20210618_preliminary_Barbara.xlsx",
+    currData <- read.xlsx("TaraPacific_EnvironmentContext_condensed-20210618_preliminary_Barbara.xlsx",
                          sheetName = "RData")
     
     # rownames(currData) <- currData$Colony
@@ -176,7 +175,7 @@ library(cowplot)
   library(rgdal)
   library(rgeos)
       
-  sstFile <- nc_open("C:/Users/uax75/OneDrive/Documents/R/TaraCoral_2020/Environ_Data/NOAA_OI_SSTv2/X90.79.167.222.277.1.2.3.nc")
+  sstFile <- nc_open("X90.79.167.222.277.1.2.3.nc")
       
       ret <- list()
       names(sstFile$var)
@@ -253,16 +252,6 @@ plot_SVD <- ggplot(subset(sampleTable, !Clade %in% c("Unassigned") & !SymClade %
         legend.title=element_text(size=8),
         legend.key.size = unit(0.4, "cm"))
 plot_SVD
-
-# propData <- subset(sampleTable, !Clade %in% c("Unassigned") & !SymClade %in% c("Unassigned"))
-# propData$Prop <- vlookup(lookup_value = propData$Colony,
-#                          dict = CladeTable,
-#                          lookup_column = "Colony",
-#                          result_column = "RatioD")
-# propData$Prop[propData$Prop == 0] <- 1
-# propData$Prop[4] = 1
-# propData$Prop <- as.numeric(propData$Prop)
-# write.csv(propData, file = paste0(outputPrefix, "_SymbiontClade_PropData.csv"), quote = F, row.names = F)
 
 propData2 <- read.csv("Pocillopora_Figures_2021-10_SymbiontClade_PropData_D.csv", header = T)
 propData2$Ile <- factor(propData2$Ile, levels=c('I15','I10','I09','I08',
