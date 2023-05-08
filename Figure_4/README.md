@@ -21,16 +21,16 @@ To produce Figure 4 of the article, the following files are required:
 ## 2. LOAD DATA & METADATA -------------------------------------------------------------------------------------------------------------------------------
 
   # Step 1 - Load Pocillopora Host and Photosymiont raw count data (reads mapped to the predicted coding sequences)
-    cts_raw_host <- read.table("../Pocillopora_MetaT_ReadCount.tab", header=TRUE, com='', sep='\t', row.names=1, check.names=FALSE)
-    cts_raw_sym <- read.table("../CladocopiumC1_MetaT_ReadCount.tab", header=TRUE, com='', sep='\t', row.names=1, check.names=FALSE)
+    cts_raw_host <- read.table("Pocillopora_MetaT_ReadCount.tab", header=TRUE, com='', sep='\t', row.names=1, check.names=FALSE)
+    cts_raw_sym <- read.table("CladocopiumC1_MetaT_ReadCount.tab", header=TRUE, com='', sep='\t', row.names=1, check.names=FALSE)
 
 
   # Step 2 - Load table with lineage assignations
-    CladeTable <- read.table("../Variables11Islands.txt", header = T)
+    CladeTable <- read.table("Variables11Islands.txt", header = T)
 
   # Step 3 - Load historical and in situ environmental data
     library(xlsx)
-    envData <- read.xlsx("../TaraPacific_Nutrents_SST_timeseries_mean_products-20220317_11Islands.xlsx", sheetName = "Sheet1")
+    envData <- read.xlsx("TaraPacific_Nutrents_SST_timeseries_mean_products-20220317_11Islands.xlsx", sheetName = "Sheet1")
         
       # Remove extraneous information
         envData <- envData[,-c(1:3)]
@@ -1128,18 +1128,18 @@ To produce Figure 4 of the article, the following files are required:
   library(qvalue)    
     
   # Step 1- Get gene lengths
-    gene_lengths <- read.table("../Pocillopora_meandrina_v3.1.annot.mrna_SeqLengths.txt", header=T, row.names=1, com='')
+    gene_lengths <- read.table("Pocillopora_meandrina_v3.1.annot.mrna_SeqLengths.txt", header=T, row.names=1, com='')
     gene_lengths <- as.matrix(gene_lengths[,1,drop=F])
     
   # Step 2 - Get host background gene list (All genes)
-    # cts_background <- read.table("../DiffExpress/Pocillopora_meandrina_v3.1.annot.mrna_RawCounts.tab", header=TRUE, com='', row.names=1, check.names=FALSE)
+    # cts_background <- read.table("Pocillopora_MetaT_ReadCount.tab", header=TRUE, com='', row.names=1, check.names=FALSE)
     Allbackground.gene_ids <- c(gsub(";.*","",rownames(cts_raw_host)))
     
   # Step 3 - Parse GO assignments
     detach("package:xlsx", unload=T)
     library(openxlsx)
     
-    GO_dat <- read.xlsx("../Pocillopora_meandrina_v3.2_annot.xlsx", sheet = "Poc_v3.2_annot.ipr", rowNames = F, colNames = F)
+    GO_dat <- read.xlsx("Pocillopora_meandrina_v3.2_annot.xlsx", sheet = "Poc_v3.2_annot.ipr", rowNames = F, colNames = F)
       
     library(plyr)
     GO_dat <- ddply(GO_dat, .(X1), summarise,
