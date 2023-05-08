@@ -149,16 +149,16 @@ dev.off()
     
     
     # Step 1- Get gene lengths
-      gene_lengths <- read.table("../Pocillopora_meandrina_v3.1.annot.mrna_SeqLengths.txt", header=T, row.names=1, com='')
+      gene_lengths <- read.table("Pocillopora_meandrina_v3.1.annot.mrna_SeqLengths.txt", header=T, row.names=1, com='')
       gene_lengths <- as.matrix(gene_lengths[,1,drop=F])
       
     # Step 2 - Get host background gene list (All genes)
-      cts_background <- read.table("../Pocillopora_MetaT_ReadCount.tab", header=TRUE, com='', row.names=1, check.names=FALSE)
+      cts_background <- read.table("Pocillopora_MetaT_ReadCount.tab", header=TRUE, com='', row.names=1, check.names=FALSE)
       Allbackground.gene_ids <- c(gsub(";.*","",rownames(cts_background)))
       
     # Step 3 - Parse GO assignments
       library(openxlsx)
-      GO_dat <- read.xlsx("../Pocillopora_meandrina_v3.2_annot.xlsx", sheet = "Poc_v3.2_annot.ipr", rowNames = F, colNames = F)
+      GO_dat <- read.xlsx("Pocillopora_meandrina_v3.2_annot.xlsx", sheet = "Poc_v3.2_annot.ipr", rowNames = F, colNames = F)
       
       library(plyr)
       GO_dat <- ddply(GO_dat, .(X1), summarise, 
