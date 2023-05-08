@@ -18,17 +18,17 @@ To produce Figure 5 of the article, the following files are required: <br>
 ## 2. LOAD DATA & METADATA -------------------------------------------------------------------------------------------------------------------------------
 
   # Step 1 - Load Pocillopora Host and Photosymiont raw count data (reads mapped to the predicted coding sequences)
-    cts_raw_host <- read.table("../Pocillopora_MetaT_ReadCount.tab", header=TRUE, com='', sep='\t', row.names=1, check.names=FALSE)
-    cts_raw_sym <- read.table("../CladocopiumC1_MetaT_ReadCount.tab", header=TRUE, com='', sep='\t', row.names=1, check.names=FALSE)
+    cts_raw_host <- read.table("Pocillopora_MetaT_ReadCount.tab", header=TRUE, com='', sep='\t', row.names=1, check.names=FALSE)
+    cts_raw_sym <- read.table("CladocopiumC1_MetaT_ReadCount.tab", header=TRUE, com='', sep='\t', row.names=1, check.names=FALSE)
 
 
   # Step 2 - Load table with lineage assignations
-    CladeTable <- read.table("../Variables11Islands.txt", header = T)
+    CladeTable <- read.table("Variables11Islands.txt", header = T)
     
   
   # Step 3 - Load historical and in situ environmental data
     library(xlsx)
-    envData <- read.xlsx("../TaraPacific_Nutrents_SST_timeseries_mean_products-20220317_11Islands.xlsx", sheetName = "Sheet1")
+    envData <- read.xlsx("TaraPacific_Nutrents_SST_timeseries_mean_products-20220317_11Islands.xlsx", sheetName = "Sheet1")
         
     # Remove extraneous information
       envData <- envData[,-c(1:3)]
