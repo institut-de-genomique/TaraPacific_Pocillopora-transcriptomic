@@ -77,8 +77,7 @@ library(xlsx)
       list (H.PCo = H.PCo, P.PCo = P.PCo)}
 
 #Genetic clades for the host and the symbiont based on the SNP.
-#Variable<-read.table("Variables11Islands.txt",sep="\t",h=T)
-Variable<-read.table("C:/Users/uax75/OneDrive/Documents/R/TaraCoral_2020/Final_Results/Pocillopora/ManuscriptDocs/Scripts/Variables11Islands.txt",sep="\t",h=T)
+Variable<-read.table("Variables11Islands.txt",sep="\t",h=T)
 
 #Remove hybrid host colony
 library(tidyr)
